@@ -7,7 +7,7 @@ A multiplayer turn-based strategy game that you can play in your browser using H
 
 # Demo
 
-A demo site is coming soon™. Note that some parts of the the code are very experimental, so please feel free to [file a bug report](https://github.com/kawakode/lords-of-the-fey/issues).
+You can play the latest version of the game here : [Lord of the Fey - Bleeding edge server](https://lotf.shinobyte.com/) <sub>hosted on Shinobyte</sub>. Note that some parts of the the code are very experimental, so please feel free to [file a bug report](https://github.com/kawakode/lords-of-the-fey/issues).
 
 # Features
 
