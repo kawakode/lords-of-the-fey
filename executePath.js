@@ -25,30 +25,61 @@ var Unit = require("./static/shared/unit.js").Unit;
 var executeAttack = require("./executeAttack");
 var Terrain = require("./static/shared/terrain.js").Terrain;
 var executeAttack = require("./executeAttack");
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return require('mongodb').ObjectID.apply(this, arguments); }
+var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
 var checkForVictory = require("./endGame").checkForVictory;
+var concludeGame = require("./endGame").concludeGame;
 
 module.exports = function(collections, data, socket, socketList) {
-        var gameId = ObjectID(data.gameId),
-            path = data.path,
-            attackIndex = data.attackIndex,
-            user = socket.request.user;
-        collections.games.findOne({_id:gameId}, function(err, game) {
+        var gameId = ObjectID(data.gameId);
+        collections.games.findOne({_id:gameId}).then(function(game) {
             if(!game) { socket.emit("no game"); return; }
+
+            // a finished game accepts no further moves
+            if(game.over) { socket.emit("moved", { path:[data.path[0]] }); return; }
+
+            performMove(collections, game, gameId, data.path, data.attackIndex, socketList, { socket: socket });
+        });
+}
+
+/**
+   Walk a unit along a path and tell everyone about it.
+
+   The path may be longer than the unit can walk this turn: whatever is left over
+   is stored on the unit as `plannedPath` and resumed by `resumePlannedMoves` when
+   its side next moves.
+
+   @param options.socket - socket of the player who ordered the move; absent when
+                           the server is resuming a plan on the player's behalf
+   @param done - called once the move has been fully resolved
+*/
+function performMove(collections, game, gameId, path, attackIndex, socketList, options, done) {
+        options = options || {};
+
+        var socket = options.socket;
+        var user = socket && socket.request.user;
+        var finished = false;
+        var finish = function() { if(!finished) { finished = true; if(done) { done(); } } };
+        var abort = function() {
+            if(socket) { socket.emit("moved", { path:[path[0]] }); }
+            finish();
+        };
+
             loadMap(game.map, function(err, mapData) {
-                collections.units.findOne({ x:path[0].x, y:path[0].y, gameId:gameId }, function(err, unit) {
+                collections.units.findOne({ x:path[0].x, y:path[0].y, gameId:gameId }).then(function(unitRecord) {
+                    if(!unitRecord) { abort(); return; }
 
                     // ensure that the logged-in user has the right to move this unit
-                    var player = game.players.filter(function(p) { return p.username == user.username })[0];
-                    if(!socketOwnerCanAct(socket, game) && player && player.team != unit.team) {
-                        socket.emit("moved", { path:[path[0]] });
-                        return;
+                    if(socket) {
+                        var player = game.players.filter(function(p) { return p.username == user.username })[0];
+                        if(!socketOwnerCanAct(socket, game) && player && player.team != unitRecord.team) {
+                            abort();
+                            return;
+                        }
                     }
 
-                    unit = new Unit(unit);
+                    var unit = new Unit(unitRecord);
 
-                    collections.units.find({ gameId: gameId }, function(err, cursor) {
-                        cursor.toArray(function(err, unitArray) {
+                    collections.units.find({ gameId: gameId }).toArray().then(function(unitArray) {
                             unitArray = unitArray.map(function(u) { return new Unit(u); });
 
                             var isInitiallyHidden = unit.hasCondition("hidden");
@@ -60,6 +91,17 @@ module.exports = function(collections, data, socket, socketList) {
                             unit.x = endPoint.x;
                             unit.y = endPoint.y;
                             unit.moveLeft -= moveResult.moveCost || 0;
+
+                            // hold on to the part of the path the unit could not walk
+                            // this turn, so that its side resumes it next turn
+                            if(moveResult.remainingPath) {
+                                unit.plannedPath = moveResult.remainingPath;
+                                if(attackIndex == null) { delete unit.plannedAttackIndex; }
+                                else { unit.plannedAttackIndex = attackIndex; }
+                            } else {
+                                delete unit.plannedPath;
+                                delete unit.plannedAttackIndex;
+                            }
 
                             if(isInitiallyHidden) { moveResult.unit = unit.getStorableObj(); }
 
@@ -80,16 +122,17 @@ module.exports = function(collections, data, socket, socketList) {
                                 game.villages[endPoint.x+","+endPoint.y] = unit.team;
                                 moveResult.capture = true;
                                 unit.moveLeft = 0;
-                                collections.games.save(game, {safe: true}, saveRevealedUnits);
+                                collections.games.replaceOne({ _id: game._id }, game).then(saveRevealedUnits);
                             } else {
                                 saveRevealedUnits();
                             }
 
-                            function saveRevealedUnits() {
-                                (function saveRevealedUnit(index) {
-                                    if(!moveResult.revealedUnits[index]) { return concludeMove(); }
-                                    collections.units.save(moveResult.revealedUnits[index], {safe:true}, function() { saveRevealedUnit(index+1); });
-                                }(0))
+                            async function saveRevealedUnits() {
+                                for(var i=0; i<moveResult.revealedUnits.length; ++i) {
+                                    var revealed = moveResult.revealedUnits[i];
+                                    await collections.units.replaceOne({ _id: revealed._id }, revealed);
+                                }
+                                concludeMove();
                             }
 
                             function concludeMove() {
@@ -115,16 +158,27 @@ module.exports = function(collections, data, socket, socketList) {
                                         if(victoryResult.victory) {
                                             socketList.filter(function(o) { return o.gameId.equals(gameId) }).forEach(function(s) { s.socket.emit("victory", victoryResult); })
                                         }
+
+                                        finish();
                                 };
 
                                 // perform the attack
                                 if(moveResult.attack && !unit.hasAttacked) {
                                     var targetCoords = path[path.length-1];
-                                    collections.units.findOne({ x:targetCoords.x, y:targetCoords.y, gameId:gameId }, function(err, defender) {
-                                        defender = new Unit(defender);
+                                    collections.units.findOne({ x:targetCoords.x, y:targetCoords.y, gameId:gameId }).then(async function(defenderRecord) {
+                                        if(!defenderRecord) {
+                                            var own = unit.getStorableObj();
+                                            await collections.units.replaceOne({ _id: own._id }, own);
+                                            emitMove();
+                                            return;
+                                        }
 
-                                        if(defender == null || defender.getAlliance(game) == unit.getAlliance(game)) { 
-                                            collections.units.save(unit.getStorableObj(), {safe:true}, emitMove);
+                                        var defender = new Unit(defenderRecord);
+
+                                        if(defender.getAlliance(game) == unit.getAlliance(game)) {
+                                            var own = unit.getStorableObj();
+                                            await collections.units.replaceOne({ _id: own._id }, own);
+                                            emitMove();
                                             return;
                                         }
 
@@ -138,53 +192,97 @@ module.exports = function(collections, data, socket, socketList) {
                                         }
                                         moveResult.combat = executeAttack(unit, attackIndex, attackSpace, defender, unitArray, mapData, game);
 
-                                        collections.games.save(game, { safe: true }, function() {
-                                            // injure/kill units models
-                                            var updateUnitDamage = function(unit, callback) {
-                                                if(unit.hp <= 0) {
-                                                    collections.units.remove({ _id: unit._id }, function() {
-                                                        if(unit.isCommander) {
-                                                            collections.units.findOne({
-                                                                gameId: unit.gameId,
-                                                                isCommander: true,
-                                                                team: unit.team
-                                                            }, function(err, commander) {
-                                                                if(!commander) {
-                                                                    console.log("COMMANDER DEATH");
-                                                                    checkForVictory(game, collections, function(victoryState) {
-                                                                        victoryResult = victoryState;
-                                                                        callback();
-                                                                        console.log("VICTORY: ", victoryState);
-                                                                    });
-                                                                } else {
-                                                                    callback();
-                                                                }
-                                                            });
-                                                        } else {
-                                                            callback();
-                                                        }
-                                                    });
-                                                }
-                                                else { collections.units.save(unit.getStorableObj(), {safe: true}, callback); }
+                                        await collections.games.replaceOne({ _id: game._id }, game);
+
+                                        // injure/kill units models
+                                        var updateUnitDamage = async function(target) {
+                                            if(target.hp > 0) {
+                                                var obj = target.getStorableObj();
+                                                await collections.units.replaceOne({ _id: obj._id }, obj);
+                                                return;
                                             }
 
-                                            var handleDefender = function() {
-                                                updateUnitDamage(defender, emitMove);
-                                            }
-                                        
-                                            updateUnitDamage(unit, handleDefender);
-                                        });
-                                    });
+                                            await collections.units.deleteOne({ _id: target._id });
+                                            if(!target.isCommander) { return; }
+
+                                            var commander = await collections.units.findOne({
+                                                gameId: target.gameId,
+                                                isCommander: true,
+                                                team: target.team
+                                            });
+                                            if(commander) { return; }
+
+                                            victoryResult = await new Promise(function(resolve) {
+                                                checkForVictory(game, collections, resolve);
+                                            });
+                                        };
+
+                                        await updateUnitDamage(unit);
+                                        await updateUnitDamage(defender);
+
+                                        // the last alliance still holding a commander wins;
+                                        // mark the game finished before telling anyone about it
+                                        if(victoryResult.victory) {
+                                            await new Promise(function(resolve) {
+                                                concludeGame(victoryResult, game, collections, resolve);
+                                            });
+                                        }
+
+                                        emitMove();
+                                    }).catch(reportFailure);
                                 } else {
-                                    collections.units.save(unit.getStorableObj(), {safe:true}, emitMove);
+                                    (async function() {
+                                        var own = unit.getStorableObj();
+                                        await collections.units.replaceOne({ _id: own._id }, own);
+                                        emitMove();
+                                    })().catch(reportFailure);
                                 }
                             }
-                        });
-                    });
-                });
+                        }).catch(reportFailure);
+                    }).catch(reportFailure);
             });
-        });
+
+        // a failed move must still release any caller waiting on this one
+        function reportFailure(err) {
+            console.error("move failed:", err);
+            abort();
+        }
 }
+
+/**
+   Resume the movement plans of a side whose turn has just begun. Each unit walks
+   as far along its stored plan as this turn allows, keeping whatever is left.
+
+   Plans run one unit at a time so that each move sees the board as the previous
+   move left it.
+*/
+module.exports.resumePlannedMoves = function(collections, gameId, game, team, socketList, callback) {
+    var done = function() { if(callback) { callback(); } };
+
+    if(game.over) { done(); return; }
+
+    collections.units.find({ gameId: gameId, team: team, plannedPath: { $exists: true } }).toArray().then(async function(records) {
+        for(var i=0; i<records.length; ++i) {
+            var record = records[i];
+            var plan = record.plannedPath;
+
+            // a plan is only good while the unit still stands where it left off
+            if(!plan || plan.length < 2 || plan[0].x != record.x || plan[0].y != record.y) {
+                await collections.units.updateOne({ _id: record._id }, { $unset: { plannedPath: "", plannedAttackIndex: "" } });
+                continue;
+            }
+
+            await new Promise(function(resolve) {
+                performMove(collections, game, gameId, plan, record.plannedAttackIndex, socketList, {}, resolve);
+            });
+        }
+
+        done();
+    }).catch(function(err) {
+        console.error("resumePlannedMoves failed:", err);
+        done();
+    });
+};
 
 var getNeighborCoords = require("./static/shared/terrain.js").Terrain.getNeighborCoords;
 
@@ -214,6 +312,7 @@ function executePath(path, unit, unitArray, mapData, game) {
     var standingClear = true;
     var totalMoveCost = 0;
     var revealedUnits = [];
+    var planInterrupted = false;
 
     for(var i=1; i<path.length; ++i) {
         var coords = path[i];
@@ -239,18 +338,19 @@ function executePath(path, unit, unitArray, mapData, game) {
             standingClear = true;
         }
 
+        // out of move points: the rest of the path becomes a plan for later turns
         if(totalMoveCost == unit.moveLeft) {
-            return concludePathing();
+            return concludePathing(false, path.slice(i-1));
         }
 
-        // add cost to move on this sapce
-        totalMoveCost += unit.getMoveCostForSpace(mapData[coords.x+","+coords.y]);
-        // Math.min.apply(Math, mapData[coords.x+","+coords.y].terrain.properties.map(function(i) { return unit.terrain[i].cost || Infinity; }));
+        var stepCost = unit.getMoveCostForSpace(mapData[coords.x+","+coords.y]);
 
-        // if the move is too costly, abort
-        if(totalMoveCost > unit.moveLeft) {
-            return { path:[path[0]], revealedUnits: [] };
+        // this step does not fit in what is left of the turn, so stop short of it
+        if(totalMoveCost + stepCost > unit.moveLeft) {
+            return concludePathing(false, path.slice(i-1));
         }
+
+        totalMoveCost += stepCost;
 
         actualPath.push(path[i]);
 
@@ -260,12 +360,16 @@ function executePath(path, unit, unitArray, mapData, game) {
             totalMoveCost = unit.moveLeft;
             var hiddenEnemies = adjacentEnemies.filter(function(e) { return e.hasCondition("hidden"); });
             revealedUnits = revealedUnits.concat(hiddenEnemies);
+
+            // running into an enemy invalidates the rest of the plan: the player
+            // should decide what to do about it rather than march on blindly
+            planInterrupted = true;
         }
     }
 
     return concludePathing();
 
-    function concludePathing(isAttack) {
+    function concludePathing(isAttack, remainingPath) {
         if(unit.attributes && unit.attributes.indexOf("ambush") != -1) {
             var prevSpaceHidden = null;
             var publicPath = actualPath.map(function(s,i) {
@@ -296,7 +400,7 @@ function executePath(path, unit, unitArray, mapData, game) {
             publicPath = actualPath;
         }
 
-        console.log(publicPath);
+        if(planInterrupted) { remainingPath = null; }
 
         return {
                  path: actualPath,
@@ -304,7 +408,10 @@ function executePath(path, unit, unitArray, mapData, game) {
                  moveCost: totalMoveCost,
                  revealedUnits: revealedUnits,
                  hide: publicPath[publicPath.length-1].hidden,
-                 attack: isAttack
+                 attack: isAttack,
+                 // spaces the unit could not reach this turn, starting at the space
+                 // it stopped on (only present when at least one space remains)
+                 remainingPath: (remainingPath && remainingPath.length > 1) ? remainingPath : null
                };
     }
 

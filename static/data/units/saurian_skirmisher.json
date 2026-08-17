@@ -1,0 +1,117 @@
+{
+  "name": "female^Saurian Skirmisher",
+  "img": "/data/img/units/saurian_skirmisher.png",
+  "cost": 15,
+  "maxHp": 26,
+  "move": 6,
+  "maxXp": 32,
+  "level": 1,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "skirmisher"
+  ],
+  "advancesTo": [
+    "saurian_ambusher"
+  ],
+  "attacks": [
+    {
+      "name": "Spear",
+      "type": "melee",
+      "damageType": "pierce",
+      "damage": 4,
+      "number": 4,
+      "icon": "/data/img/attacks/spear.png",
+      "animation": [
+        1,
+        9
+      ]
+    },
+    {
+      "name": "Spear",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 4,
+      "number": 2,
+      "icon": "/data/img/attacks/spear-thrown.png",
+      "animation": [
+        10,
+        18
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "frozen": {
+      "move": 4,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "mountains": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": -0.1,
+    "pierce": 0.2,
+    "impact": -0.1,
+    "fire": -0.2,
+    "cold": -0.2,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/saurian_skirmisher-sprite.png"
+}

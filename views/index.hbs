@@ -19,25 +19,42 @@
 -->
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lords of the Fey</title>
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
   <link rel="stylesheet" type="text/css" href="/css/mainmenu.css" />
 </head>
-<body style="padding:0; margin:0; background-image:url('screenshot.png');">
+<body class="fey-page">
 {{> menuheader}}
-<div class="main-content" style="padding: 5px; text-align: center;">
-<h1>Lords of the Fey</h1>
+<div class="main-content fey-shell">
 
-<div style="max-width: 800px; margin: 0 auto 25px auto;">Lords of the Fey is an attempt to recreate (something like) <a href="http://wesnoth.org">Battle for Wesnoth</a> for the browser. The game is under development.</div>
+<div class="fey-hero">
+  <span class="fey-crest"></span>
+  <h1 class="fey-title">Lords of the Fey</h1>
+  <div class="fey-subtitle">Turn-based tactics on hexes of forest, hill and stone.</div>
+  <div class="fey-rule"><span></span></div>
+</div>
 
+<div class="fey-panel fey-panel-wood fey-menu">
 {{#if username}}
-<div class="option"><a href="lobby" class="option">Lobby (under development)</a></div>
-<div class="option"><a href="/gamelist" class="option">Your game list</a></div>
+<div class="option"><a href="lobby" class="option">Enter the Lobby<span class="fey-tag">in development</span></a></div>
+<div class="option"><a href="/gamelist" class="option">Your Campaigns</a></div>
 {{else}}
-<div class="option"><a href="login.html" class="option">Log In</a></div>
-<div class="option"><a href="signup.html" class="option">Sign Up</a></div>
+<div class="option"><a href="/login.html" class="option">Log In</a></div>
+<div class="option"><a href="/signup.html" class="option">Sign Up</a></div>
 {{/if}}
-<div style="max-width: 800px; margin: 15px auto;">Learn more at the <a href="https://github.com/apsillers/lords-of-the-fey">project's GitHub page</a> and <a href="https://github.com/apsillers/lords-of-the-fey/wiki">wiki</a>. Feel free to <strong><a href="https://github.com/apsillers/lords-of-the-fey/issues">open a bug report</a></strong> if you encounter any problems.</div>
-<div style="max-width: 800px; margin: 0 auto;">Lords of the Fey is licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License</a> (AGPL), meaning that anyone who uses the program over a network must be offered the source code. You can download the source at the <a href="https://github.com/apsillers/lords-of-the-fey">project's GitHub page</a>.</div>
+</div>
+
+<div class="fey-panel fey-panel-parchment fey-blurb">
+Lords of the Fey is an attempt to recreate (something like) <a href="http://wesnoth.org">Battle for Wesnoth</a> for the browser. The game is under development.
+</div>
+
+<div class="fey-footnotes">
+<p>Learn more at the <a href="https://github.com/apsillers/lords-of-the-fey">project's GitHub page</a> and <a href="https://github.com/apsillers/lords-of-the-fey/wiki">wiki</a>. Feel free to <strong><a href="https://github.com/apsillers/lords-of-the-fey/issues">open a bug report</a></strong> if you encounter any problems.</p>
+<p>Lords of the Fey is licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License</a> (AGPL), meaning that anyone who uses the program over a network must be offered the source code. You can download the source at the <a href="https://github.com/apsillers/lords-of-the-fey">project's GitHub page</a>.</p>
+</div>
+
 </div>
 
 </body>

@@ -18,7 +18,23 @@
 */
 
 /**
-A* implementation with built-in move rules (e.g.Only finds paths whose cost is less than the `moveLeft` property of the unit.
+   Multi-turn path costs are packed into a single number so that A* can compare
+   them directly: the thousands place counts whole turns spent, the remainder
+   counts move points spent within that turn. A path that takes fewer turns
+   always beats one that takes more, and ties break on move points used.
+*/
+var TURN_COST = 1000;
+
+/** how many turns ahead a movement plan may reach */
+var MAX_PLANNED_TURNS = 8;
+
+function turnOfCost(cost) { return Math.floor(cost / TURN_COST); }
+function moveSpentInTurn(cost) { return cost % TURN_COST; }
+
+/**
+A* implementation with built-in move rules. Paths may run past the unit's
+remaining move points: the extra spaces become a plan for later turns, and each
+path node carries the `turn` (0 for the current turn) on which it is reached.
 
 */
 function aStar(world, unit, start, goal, prevPath, game) {
@@ -29,8 +45,9 @@ function aStar(world, unit, start, goal, prevPath, game) {
         return false;
     }
 
-    if(prevPath) {
-        var prevDest = prevPath[prevPath.length-1].space;
+    if(prevPath && prevPath.length) {
+        var prevDestNode = prevPath[prevPath.length-1];
+        var prevDest = prevDestNode.space;
 
         // if the previous path was a move adjacent to an enemy, and now the path is *on* that abjecent enemy, do not recompute the path
         // this allows the player to pcik the offense location, instead of relying on the normal A* path to the enemy
@@ -40,7 +57,9 @@ function aStar(world, unit, start, goal, prevPath, game) {
            world.getNeighbors(goal).indexOf(prevDest) != -1 // and the occupied goal space is adjacent to the end of the previous path
           ) {
             var newPath = prevPath.slice();
-            newPath.push({ space: goal, g_score:prevDest.g_score }); // return the previous path with the enemy target appended
+            // return the previous path with the enemy target appended; attacking
+            // costs no move points, so the target is reached on the same turn
+            newPath.push({ space: goal, g_score: prevDestNode.g_score, turn: prevDestNode.turn });
             return newPath;
         }
     }
@@ -85,10 +104,10 @@ function aStar(world, unit, start, goal, prevPath, game) {
             var neighbor = neighbors[i];
 
             if(neighbor in closedset) { continue; }
-            var tentative_g_score = g_score[current] + cost_to_move_here(neighbor);
+            var tentative_g_score = cost_after_moving_here(g_score[current], neighbor);
 
-            if(tentative_g_score > unit.moveLeft) { continue; }
-            //console.log(tentative_g_score, unit.moveLeft)
+            // unreachable terrain, or further ahead than we are willing to plan
+            if(tentative_g_score == null) { continue; }
 
             if(!(neighbor in openset) || tentative_g_score < g_score[neighbor]) {
                 came_from[neighbor] = current;
@@ -106,10 +125,10 @@ function aStar(world, unit, start, goal, prevPath, game) {
     function reconstruct_path(came_from, current_node) {
         if(current_node in came_from) {
             p = reconstruct_path(came_from, came_from[current_node]);
-            p.push({ space: current_node, g_score: g_score[current_node] });
+            p.push({ space: current_node, g_score: g_score[current_node], turn: turnOfCost(g_score[current_node]) });
             return p;
         } else {
-            return [{ space: current_node, g_score: g_score[current_node] }];
+            return [{ space: current_node, g_score: g_score[current_node], turn: turnOfCost(g_score[current_node]) }];
         }
     }
 
@@ -119,30 +138,48 @@ function aStar(world, unit, start, goal, prevPath, game) {
         return 0;
     }
 
-    function cost_to_move_here(space) {
+    /** move points available on the given turn (the current turn is partly spent) */
+    function move_budget_for_turn(turn) {
+        return turn == 0 ? unit.moveLeft : unit.move;
+    }
+
+    /**
+       Packed cost of standing on `space` after moving there from a space whose
+       packed cost is `cost_so_far`. Returns null if the space cannot be entered,
+       or if reaching it would take more turns than we plan for.
+    */
+    function cost_after_moving_here(cost_so_far, space) {
         var occupant = world.getUnitAt(space);
         var is_enemy_present = occupant && occupant.getAlliance(game) != unit.getAlliance(game);
-        var normal_move_cost = unit.getMoveCostForSpace(space);
-        if(space == goal && is_enemy_present) { return 0; }
 
-        // test if this pace has an enemy adjacent
+        // attacking the goal costs no move points, only the chance to move again
+        if(space == goal && is_enemy_present) { return cost_so_far; }
+
+        var normal_move_cost = unit.getMoveCostForSpace(space);
+        if(!isFinite(normal_move_cost)) { return null; }
+
+        var turn = turnOfCost(cost_so_far);
+        var spent = moveSpentInTurn(cost_so_far);
+
+        // not enough move points left this turn: wait here and continue next turn
+        if(spent + normal_move_cost > move_budget_for_turn(turn)) {
+            turn += 1;
+            spent = 0;
+            if(turn > MAX_PLANNED_TURNS) { return null; }
+            // terrain nobody could enter even on a fresh turn
+            if(normal_move_cost > move_budget_for_turn(turn)) { return null; }
+        }
+
+        spent += normal_move_cost;
+
+        // an enemy's zone of control ends the unit's movement for that turn
         var is_enemy_adjacent = world.getNeighbors(space).some(function(n) {
             var n_occupant = world.getUnitAt(n);
-            if(n_occupant && n_occupant.getAlliance(game) != unit.getAlliance(game)) {
-                return true;
-            }
+            return n_occupant && n_occupant.getAlliance(game) != unit.getAlliance(game);
         });
+        if(is_enemy_adjacent) { spent = move_budget_for_turn(turn); }
 
-        // if so, moving here either costs all our remaining move
-        // OR the normal cost for this terrain (in case that's MORE than all our remaining move)
-        // so you can move adjacent to an enemy only if you could move there normally
-        if(is_enemy_adjacent) {
-            var all_remaining_move = unit.moveLeft - g_score[current];
-            return Math.max(all_remaining_move, normal_move_cost);
-        } else {
-            // just normal move cost
-            return normal_move_cost;
-        }
+        return turn * TURN_COST + spent;
     }
 
     // is this space free of enemies?

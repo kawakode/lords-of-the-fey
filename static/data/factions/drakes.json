@@ -1,0 +1,14 @@
+{
+    "name": "Drakes",
+    "recruitList": [
+        "drake_fighter",
+        "drake_clasher",
+        "drake_burner",
+        "drake_glider",
+        "saurian_skirmisher",
+        "saurian_augur"
+    ],
+    "commanderList": [
+        "drake_flare"
+    ]
+}

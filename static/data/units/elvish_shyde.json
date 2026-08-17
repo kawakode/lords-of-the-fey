@@ -1,0 +1,138 @@
+{
+  "name": "female^Elvish Shyde",
+  "img": "/data/img/units/elvish_shyde.png",
+  "cost": 52,
+  "maxHp": 46,
+  "move": 6,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "neutral",
+  "fixedAttributes": [
+    "heals_8",
+    "cures"
+  ],
+  "attributePool": [
+    "dextrous"
+  ],
+  "attacks": [
+    {
+      "name": "Faerie touch",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 6,
+      "number": 2,
+      "icon": "/data/img/attacks/touch-faerie.png",
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        1,
+        3
+      ]
+    },
+    {
+      "name": "Ensnare",
+      "type": "ranged",
+      "damageType": "impact",
+      "damage": 6,
+      "number": 3,
+      "icon": "/data/img/attacks/entangle.png",
+      "properties": [
+        "slow"
+      ],
+      "animation": [
+        4,
+        4
+      ]
+    },
+    {
+      "name": "Thorns",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 8,
+      "number": 3,
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        5,
+        5
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "deep_water": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.0
+  },
+  "sprite": "/data/img/units/elvish_shyde-sprite.png"
+}

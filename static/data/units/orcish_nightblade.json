@@ -1,0 +1,127 @@
+{
+  "name": "Orcish Nightblade",
+  "img": "/data/img/units/orcish_nightblade.png",
+  "cost": 53,
+  "maxHp": 48,
+  "move": 6,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "chaotic",
+  "attacks": [
+    {
+      "name": "Blade",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 12,
+      "number": 2,
+      "icon": "/data/img/attacks/dagger-orcish.png",
+      "animation": [
+        1,
+        9
+      ]
+    },
+    {
+      "name": "Kick",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 11,
+      "number": 2,
+      "icon": "/data/img/attacks/foot-boot.png",
+      "animation": [
+        10,
+        21
+      ]
+    },
+    {
+      "name": "Throwing knives",
+      "type": "ranged",
+      "damageType": "blade",
+      "damage": 6,
+      "number": 4,
+      "icon": "/data/img/attacks/dagger-thrown-poison-orcish.png",
+      "properties": [
+        "marksman",
+        "poison"
+      ],
+      "animation": [
+        22,
+        30
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": -0.3,
+    "pierce": -0.2,
+    "impact": -0.2,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.0
+  },
+  "sprite": "/data/img/units/orcish_nightblade-sprite.png"
+}

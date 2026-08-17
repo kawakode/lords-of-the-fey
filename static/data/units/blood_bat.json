@@ -1,0 +1,108 @@
+{
+  "name": "Blood Bat",
+  "img": "/data/img/units/blood_bat.png",
+  "cost": 23,
+  "maxHp": 27,
+  "move": 9,
+  "maxXp": 37,
+  "level": 1,
+  "alignment": "chaotic",
+  "attributePool": [
+    "feral"
+  ],
+  "advancesTo": [
+    "dread_bat"
+  ],
+  "attacks": [
+    {
+      "name": "Fangs",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 5,
+      "number": 3,
+      "icon": "/data/img/attacks/fangs-animal.png",
+      "properties": [
+        "drains"
+      ],
+      "animation": [
+        1,
+        9
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": -1,
+      "cover": 0
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "reef": {
+      "move": -1,
+      "cover": 0
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": -1,
+      "cover": 0
+    },
+    "forest": {
+      "move": -1,
+      "cover": 0
+    },
+    "frozen": {
+      "move": -1,
+      "cover": 0
+    },
+    "hills": {
+      "move": -1,
+      "cover": 0
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": -1,
+      "cover": 0
+    },
+    "shallow_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "swamp": {
+      "move": -1,
+      "cover": 0
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": -1,
+      "cover": 0
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.3,
+    "arcane": 0.0
+  },
+  "sprite": "/data/img/units/blood_bat-sprite.png"
+}

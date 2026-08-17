@@ -20,38 +20,57 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lobby</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="../client/jquery-2.0.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/theme.css" />
     <link rel="stylesheet" type="text/css" href="/css/lobby.css" />
   </head>
-  <body>
+  <body class="fey-page">
 
-    <div id="lobby-menu">
-      <input type="button" value="Create Room" id="create-game">
+    <div id="top-main-menu">
+      <div style="float:left;">
+        <b><a href="/">Lords of the Fey</a></b>
+      </div>
+      <div class="username-main-menu" style="float:right;">
+        <a href="/gamelist">Your campaigns</a> &#9670; <a href="/logout">Log out</a>
+      </div>
     </div>
 
-    <div id="lobby-below-menu">
-      <div id="player-list"></div>
+    <div class="fey-shell fey-shell-wide">
 
-      <div id="room-list"></div>
+      <div id="lobby-menu">
+        <div class="fey-lobby-title">The Lobby</div>
+        <input type="button" value="Raise a Room" id="create-game" class="fey-button-primary">
+      </div>
+
+      <div id="lobby-below-menu">
+        <div id="player-list" class="fey-panel fey-panel-wood fey-scrollable"></div>
+
+        <div id="room-list" class="fey-panel fey-scrollable"></div>
+      </div>
+
+      <div id="chat">
+        <div id="chat-messages" class="fey-scrollable"></div>
+        <input type="text" id="chat-input" placeholder="Speak, and the hall will hear you">
+      </div>
+
     </div>
 
-    <div id="chat">
-      <div id="chat-messages" style="height: 100px; border: thin solid gray; overflow-y: scroll;"></div>
-      <input type="text" id="chat-input">
-    </div>
-
-    <div style="display:none; width:100%; height:100%; background-color:rgba(0, 0, 0, 0.7); position: fixed; top: 0px;" id="create-dialog">
-      <div id="create-dialog-inner" style="background-color: #F7F6F3; width:400px; margin: auto; padding: 20px; margin-top:10px;">
-          <div><span style="font-weight:bold;">New Game</span><span style="float:right; font-size:70%; clear:right;">(Press Esc to return)</span></div>
-          <div>Name: <input type="text" id="create-dialog-name"></div>
-          <div>
-            <select id="create-dialog-map">
-            </select>
-          </div>
-          <div><input type="button" value="Launch Room" id="launch-game"></div>
+    <div style="display:none;" id="create-dialog">
+      <div id="create-dialog-inner">
+        <div class="fey-dialog-title"><span>New Game</span><span class="fey-dialog-hint">Esc to return</span></div>
+        <div>
+          <label for="create-dialog-name">Room name</label>
+          <input type="text" id="create-dialog-name">
         </div>
+        <div>
+          <label for="create-dialog-map">Battlefield</label>
+          <select id="create-dialog-map"></select>
+        </div>
+        <div class="fey-dialog-actions"><input type="button" value="Launch Room" id="launch-game" class="fey-button-primary"></div>
+      </div>
     </div>
 
     <script src="lobby.js"></script>

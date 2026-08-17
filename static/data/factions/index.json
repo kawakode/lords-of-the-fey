@@ -1,0 +1,28 @@
+{
+    "factions": [
+        {
+            "id": "elves",
+            "name": "Elves"
+        },
+        {
+            "id": "orcs",
+            "name": "Orcs"
+        },
+        {
+            "id": "loyalists",
+            "name": "Loyalists"
+        },
+        {
+            "id": "undead",
+            "name": "Undead"
+        },
+        {
+            "id": "drakes",
+            "name": "Drakes"
+        },
+        {
+            "id": "knalgans",
+            "name": "Knalgan Alliance"
+        }
+    ]
+}

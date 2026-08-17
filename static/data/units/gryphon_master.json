@@ -1,0 +1,99 @@
+{
+  "name": "Gryphon Master",
+  "img": "/data/img/units/gryphon_master.png",
+  "cost": 40,
+  "maxHp": 51,
+  "move": 10,
+  "maxXp": 100,
+  "level": 2,
+  "alignment": "neutral",
+  "attacks": [
+    {
+      "name": "Claws",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 15,
+      "number": 2,
+      "icon": "/data/img/attacks/claws-animal.png",
+      "animation": [
+        1,
+        3
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": -1,
+      "cover": 0
+    },
+    "cave": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "reef": {
+      "move": -1,
+      "cover": 0
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": -1,
+      "cover": 0
+    },
+    "forest": {
+      "move": -1,
+      "cover": 0
+    },
+    "frozen": {
+      "move": -1,
+      "cover": 0
+    },
+    "hills": {
+      "move": -1,
+      "cover": 0
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 3,
+      "cover": 1.7
+    },
+    "sand": {
+      "move": -1,
+      "cover": 0
+    },
+    "shallow_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "swamp": {
+      "move": -1,
+      "cover": 0
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": -1,
+      "cover": 0
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/gryphon_master-sprite.png"
+}

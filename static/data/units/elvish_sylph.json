@@ -1,0 +1,135 @@
+{
+  "name": "female^Elvish Sylph",
+  "img": "/data/img/units/elvish_sylph.png",
+  "cost": 110,
+  "maxHp": 60,
+  "move": 6,
+  "maxXp": 200,
+  "level": 4,
+  "alignment": "neutral",
+  "attributePool": [
+    "dextrous"
+  ],
+  "attacks": [
+    {
+      "name": "Faerie touch",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 6,
+      "number": 3,
+      "icon": "/data/img/attacks/touch-faerie.png",
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "Ethereal web",
+      "type": "ranged",
+      "damageType": "impact",
+      "damage": 7,
+      "number": 5,
+      "icon": "/data/img/attacks/web.png",
+      "properties": [
+        "slow"
+      ],
+      "animation": [
+        2,
+        2
+      ]
+    },
+    {
+      "name": "Faerie fire",
+      "type": "ranged",
+      "damageType": "arcane",
+      "damage": 10,
+      "number": 5,
+      "icon": "/data/img/attacks/faerie-fire.png",
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        3,
+        3
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "deep_water": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.2
+  },
+  "sprite": "/data/img/units/elvish_sylph-sprite.png"
+}

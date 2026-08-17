@@ -16,3 +16,10 @@ npm-debug.log
 node_modules
 
 config.js
+.env
+.env.local
+.env.*.local
+.wesnoth-cache/
+.playwright-mcp/
+__pycache__/
+*.pyc

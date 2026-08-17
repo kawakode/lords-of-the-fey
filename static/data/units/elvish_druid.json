@@ -1,0 +1,138 @@
+{
+  "name": "female^Elvish Druid",
+  "img": "/data/img/units/elvish_druid.png",
+  "cost": 25,
+  "maxHp": 36,
+  "move": 5,
+  "maxXp": 85,
+  "level": 2,
+  "alignment": "neutral",
+  "fixedAttributes": [
+    "heals_8",
+    "cures"
+  ],
+  "attributePool": [
+    "dextrous"
+  ],
+  "advancesTo": [
+    "elvish_shyde"
+  ],
+  "attacks": [
+    {
+      "name": "Staff",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 4,
+      "number": 2,
+      "icon": "/data/img/attacks/druidstaff.png",
+      "animation": [
+        1,
+        3
+      ]
+    },
+    {
+      "name": "Ensnare",
+      "type": "ranged",
+      "damageType": "impact",
+      "damage": 6,
+      "number": 2,
+      "icon": "/data/img/attacks/entangle.png",
+      "properties": [
+        "slow"
+      ],
+      "animation": [
+        4,
+        11
+      ]
+    },
+    {
+      "name": "Thorns",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 6,
+      "number": 3,
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        12,
+        19
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.0
+  },
+  "sprite": "/data/img/units/elvish_druid-sprite.png"
+}

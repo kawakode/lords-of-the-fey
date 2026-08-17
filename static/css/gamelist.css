@@ -1,37 +1,158 @@
-.game-row {
-    padding: 18px;
-    border: thin solid black;
-    margin: 5px auto;
-    max-width: 800px;
-    border-radius: 5px;
-    background-color: #DDD;
-}
+/**
+    Copyright 2014 Andrew P. Sillers
 
-.game-row a {
-    text-decoration: none;
-}
+    This file is part of Lords of the Fey.
 
-.game-row.active-turn {
-    color: green;
-    background-color: #8F8;
-    border: thin solid #0F0;
-}
+    Lords of the Fey is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-.game-row.active-turn:before {
-    content: '(!)';
-}
+    Lords of the Fey is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
 
-.game-row .username {
-    border: thin solid #00F;
-    background-color: #99F;
-    padding: 2px 2px;
-    border-radius: 5px;
-}
+    You should have received a copy of the GNU Affero General Public License
+    along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* Your campaigns: a stone ledger of ongoing wars. */
 
 #gamelist-header {
     text-align: center;
 }
 
+#gamelist-header h1 {
+    margin-bottom: 4px;
+}
+
+.game-row {
+    position: relative;
+    max-width: 780px;
+    margin: 8px auto;
+    padding: 0;
+    background-color: var(--stone-dark);
+    background-image: linear-gradient(170deg, #4c4740 0%, #35322b 55%, #24211c 100%);
+    border: 2px solid var(--stone);
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.game-row a {
+    display: block;
+    padding: 16px 18px 16px 44px;
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.game-row a:hover {
+    color: #fff4d2;
+}
+
+.game-row:hover {
+    border-color: var(--stone-light);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 0 16px rgba(195, 155, 40, 0.25);
+}
+
+/* hex marker in place of the old bullet */
+.game-row::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    margin-top: -8px;
+    width: 14px;
+    height: 16px;
+    background: var(--stone-light);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.game-row.active-turn {
+    color: inherit;
+    background-image: linear-gradient(170deg, #3f5533 0%, #2c3b24 55%, #1e2718 100%);
+    border-color: var(--moss-light);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 18px rgba(127, 167, 87, 0.35);
+}
+
+.game-row.active-turn::before {
+    background: var(--moss-light);
+    box-shadow: 0 0 10px rgba(127, 167, 87, 0.9);
+}
+
+.game-row.active-turn a::after {
+    content: "your move";
+    display: inline-block;
+    margin-left: 10px;
+    padding: 2px 8px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #eaf6df;
+    background: rgba(79, 113, 54, 0.85);
+    border: 1px solid var(--moss-light);
+    border-radius: 2px;
+    vertical-align: middle;
+}
+
+/* a concluded war: greyed out, with its result stamped on the row */
+.game-row.finished-game {
+    opacity: 0.72;
+    background-image: linear-gradient(170deg, #3a3833 0%, #2b2924 55%, #1d1b18 100%);
+    border-color: var(--stone);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.game-row.finished-game::before {
+    background: var(--stone);
+    box-shadow: none;
+}
+
+.game-row .game-result {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 2px 8px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--stone-light);
+    border-radius: 2px;
+    vertical-align: middle;
+}
+
+.game-row .username {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 2px 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    background-image: linear-gradient(180deg, #f0e5c6 0%, var(--parchment-shade) 100%);
+    border: 1px solid var(--parchment-edge);
+    border-radius: 2px;
+}
+
+.game-row .fey-map-name {
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+}
+
 #nogames {
+    max-width: 560px;
+    margin: 24px auto;
     text-align: center;
+    font-style: italic;
+    color: var(--parchment-shade);
 }

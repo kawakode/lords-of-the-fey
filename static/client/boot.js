@@ -31,7 +31,7 @@ var gameInfo = {
     gameId: qStringMatch[1],
     anonToken: qTokenMatch
 };
-var factionList = ["elves", "orcs"];
+var factionList = [];
 var factionDict = {};
 
 /**************************/
@@ -63,15 +63,12 @@ window.addEventListener("load", function() {
 
                 gameInfo.alliances = data.alliances;
                 gameInfo.activeTeam = data.activeTeam;
-                if(gameInfo.activeTeam == gameInfo.player.team) { ui.hasTurn = true; $("#end-turn-button").prop("disabled", false); }
+                if(!data.over && gameInfo.activeTeam == gameInfo.player.team) { ui.hasTurn = true; $("#end-turn-button").prop("disabled", false); }
 
                 gameInfo.timeOfDay = data.timeOfDay;
-                $("#right_time_of_day").prop("src", "/data/img/schedule/schedule-"+gameInfo.timeOfDay+".png")
-                $("#right_time_of_day").prop("title", gameInfo.timeOfDay.replace(/\b./g, function(s) { return s.toUpperCase(); }));
 
                 $("#top-gold-text").text(gameInfo.player.gold);
-                $("#top-active-team-text").text(gameInfo.activeTeam);
-                $("#top-active-color").css("background-color", ["rgba(0,0,0,0)","#F00","#00F","#F0F", "#444"][gameInfo.activeTeam]);
+                ui.updateTurnStatus();
 
                 gameInfo.villages = data.villages;
                 ui.updateVillageStats();
@@ -86,41 +83,91 @@ window.addEventListener("load", function() {
                     $("#end-turn-button").prop("disabled", true);
                 });
 
-                $("#load-text").text("Loading units...");
+                $("#load-text").text("Loading factions...");
 
-                unitLib.init(function() {
+                // The faction list and the map are both data-driven. The factions
+                // decide which of the ~160 unit types this game can field and the map
+                // decides which of Wesnoth's ~290 terrain tiles it uses; loading every
+                // image of both would mean megabytes nobody is going to see.
+                var mapText;
+
+                loadFactionData(function() {
+                    $("#load-text").text("Loading units...");
+                    unitLib.init(startTerrainLoad,
+                                 function(e) { $("#load-progress").attr("value", e.progress*100); },
+                                 unitTypesInPlay());
+                });
+
+                /** fetch the faction index, then every faction file, then the map */
+                function loadFactionData(done) {
+                    $.getJSON("/data/factions/index.json", function(factionIndex) {
+                        factionList = factionIndex.factions.map(function(f) { return f.id; });
+
+                        var requests = factionList.map(function(name) {
+                            return $.getJSON("/data/factions/" + name + ".json", function(faction) {
+                                factionDict[name] = faction;
+                            });
+                        });
+                        requests.push($.get("/data/maps/" + data.map, function(text) { mapText = text; }, "text"));
+
+                        $.when.apply($, requests).done(done);
+                    });
+                }
+
+                /** every unit type the sides in this game can put on the board */
+                function unitTypesInPlay() {
+                    var types = {};
+
+                    (data.players || []).forEach(function(player) {
+                        var faction = factionDict[player.faction];
+                        if(!faction) { return; }
+                        (faction.recruitList || []).forEach(function(t) { types[t] = true; });
+                        (faction.commanderList || []).forEach(function(t) { types[t] = true; });
+                    });
+
+                    // units already on the board may predate the current faction lists
+                    (data.units || []).forEach(function(unit) {
+                        if(unit.type) { types[unit.type] = true; }
+                    });
+
+                    return Object.keys(types);
+                }
+
+                function startTerrainLoad() {
                     $("#load-text").text("Loading terrain...");
+
                     var queue = new createjs.LoadQueue();
                     queue.on("complete", handleComplete, this);
                     queue.on("progress", function(e) { $("#load-progress").attr("value", e.progress*100); });
-                    var factionManifest = factionList.map(function(k){
-                        return { id:"faction"+k, src:"/data/factions/"+k+".json", type:createjs.LoadQueue.JSON }
-                    });
-                    queue.loadManifest(factionManifest);
+
+                    // collect the tile images this particular map actually uses
+                    var usedImages = {};
+                    var mapDict = toMapDict(mapText);
+                    for(var coords in mapDict) {
+                        var tileTerrain = mapDict[coords].terrain;
+                        if(tileTerrain.img) { usedImages[tileTerrain.img] = true; }
+                        if(tileTerrain.overlayImg) { usedImages[tileTerrain.overlayImg] = true; }
+                    }
                     queue.loadManifest(
-                        Object.keys(Terrain.bases).map(function(k){ return {id:"base"+k, src:Terrain.bases[k].img }; })
+                        Object.keys(usedImages).map(function(src){ return { id:"terrain"+src, src:src }; })
                     );
-                    queue.loadManifest(
-                        Object.keys(Terrain.overlays).map(function(k){ return {id:"overlay"+k, src:Terrain.overlays[k].img }; })
-                    );
+
                     queue.loadManifest(
                         Object.keys(Terrain.transitions).reduce(function(arr,k){
                             var imgBase = Terrain.transitions[k].imgBase;
                             return arr.concat(Terrain.transitions[k].dirs.map(function(d){ return {id:"transition"+k+"-"+d, src:imgBase+"-"+d+".png" }; }));
                         }, [])
                     );
-                    queue.loadFile({id:"map", src:"/data/maps/"+data.map, type:createjs.LoadQueue.TEXT});
 
                     function handleComplete() {
                         $("#loading-overlay").hide();
 
                         for(var k in Terrain.bases) {
-                            Terrain.bases[k].imgObj = queue.getResult("base"+k);
+                            Terrain.bases[k].imgObj = queue.getResult("terrain"+Terrain.bases[k].img);
                         }
                         for(k in Terrain.overlays) {
-                            Terrain.overlays[k].imgObj = queue.getResult("overlay"+k);
+                            Terrain.overlays[k].imgObj = queue.getResult("terrain"+Terrain.overlays[k].img);
                         }
-                        console.log("hello complete");
                         for(k in Terrain.transitions) {
                             Terrain.transitions[k].imgObjs = {};
                             for(var i=0; i<Terrain.transitions[k].dirs.length; ++i) {
@@ -128,18 +175,15 @@ window.addEventListener("load", function() {
                                 Terrain.transitions[k].imgObjs[d] = queue.getResult("transition"+k+"-"+d);
                             }
                         }
-                
-                        for(var i = 0; i < factionList.length; ++i) {
-                            var factionName = factionList[i];
-                            factionDict[factionName] = queue.getResult("faction"+factionName);
-                        }
 
-                        if(gameInfo.player.faction) {
+                        if(gameInfo.player.faction && factionDict[gameInfo.player.faction]) {
                             gameInfo.player.recruitList = factionDict[gameInfo.player.faction].recruitList;
                         }
 
                         world = new World("c");
-                        world.initGrid(toMapDict(queue.getResult("map")));
+                        // re-parse now that the tile images are loaded, so each space
+                        // gets a real image object rather than an empty placeholder
+                        world.initGrid(toMapDict(mapText));
                         world.stage.canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); });
                         window.addEventListener("resize", function() { world.resizeCanvasToWindow(); });
                         scroll.addScroll();
@@ -166,8 +210,11 @@ window.addEventListener("load", function() {
                                 socket.emit("levelup", { gameId: gameInfo.gameId, choiceNum: choiceNum, anonToken: gameInfo.anonToken });
                             });
                         }
+
+                        // the game may already have been decided before we joined
+                        if(data.over) { announceVictory(data.winner); }
                     }
-                }, function(e) { $("#load-progress").attr("value", e.progress*100); });
+                }
             });
 
             socket.on("leveledup", function(data) {
@@ -189,14 +236,10 @@ window.addEventListener("load", function() {
             socket.on("newTurn", function(data) {
                 actionQueue.addAction(function() {
                     gameInfo.activeTeam = data.activeTeam;
-                    $("#top-active-team-text").text(gameInfo.activeTeam);
-                    $("#top-active-color").css("background-color", ["rgba(0,0,0,0)","#F00","#00F","#F0F", "#444"][gameInfo.activeTeam]);
-                    if(gameInfo.activeTeam == gameInfo.player.team) { ui.hasTurn = true; $("#end-turn-button").prop("disabled", false); }        
+                    if(gameInfo.activeTeam == gameInfo.player.team) { ui.hasTurn = true; $("#end-turn-button").prop("disabled", false); }
 
                     gameInfo.timeOfDay = data.timeOfDay;
-                    $("#right_time_of_day").text(gameInfo.timeOfDay)
-                    $("#right_time_of_day").prop("src", "/data/img/schedule/schedule-"+gameInfo.timeOfDay+".png")
-                    $("#right_time_of_day").prop("title", gameInfo.timeOfDay.replace(/\b./g, function(s) { return s.toUpperCase(); }));
+                    ui.updateTurnStatus();
 
                     for(var i in data.updates) {
                         var update = data.updates[i];
@@ -249,19 +292,41 @@ window.addEventListener("load", function() {
 
             socket.on("victory", function(data) {
                 actionQueue.addAction(function() {
-                    if(data.victory) {
-                        if("team" in gameInfo.player) {
-                            if(gameInfo.player.alliance == data.alliance) { alert("You are victorious!"); }
-                            else { alert("You were defeated!"); }
-                        } else {
-                            alert("Alliance " + data.alliance + "wins!");
-                        }
-                    }
+                    if(data.victory) { announceVictory(data.alliance); }
                 });
             });
 
     });
 });
+
+/**
+   The game has been won: lock the board and tell the player how it ended.
+   Safe to call more than once.
+*/
+function announceVictory(alliance) {
+    if(gameInfo.over) { return; }
+
+    gameInfo.over = true;
+    gameInfo.winner = alliance;
+
+    ui.hasTurn = false;
+    $("#end-turn-button").prop("disabled", true);
+
+    var message;
+    if(alliance == null) {
+        message = "Every commander has fallen. The war ends in a draw.";
+    } else if("team" in gameInfo.player) {
+        message = (gameInfo.player.alliance == alliance) ? "You are victorious!" : "You were defeated!";
+    } else {
+        message = "Alliance " + alliance + " wins!";
+    }
+
+    $("#top-active-team-text").text("game over");
+    $("#top-active-color").css("background-color", "rgba(0,0,0,0)");
+    $("#top-active-team").attr("data-tip", "This game is over.\n" + message);
+
+    alert(message);
+}
 
 var actionQueue = {
     queue: [],
@@ -275,7 +340,11 @@ var actionQueue = {
 }
 
 // Check if a new cache is available on page load.
+// AppCache has been removed from current browsers, so this only runs where it
+// still exists; without the guard it throws on every load.
 window.addEventListener('load', function(e) {
+
+  if(!window.applicationCache) { return; }
 
   window.applicationCache.addEventListener('updateready', function(e) {
     if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {

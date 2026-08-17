@@ -18,13 +18,14 @@
 */
 var socketOwnerCanAct = require("./auth").socketOwnerCanAct;
 var Unit = require("./static/shared/unit.js").Unit;
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return require('mongodb').ObjectID.apply(this, arguments); }
+var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
 
 exports.levelUp = function(collections, data, socket, socketList) {
     var gameId = ObjectID(data.gameId);
     var choiceNum = data.choiceNum;
     var user = socket.request.user;
-        collections.games.findOne({_id:gameId}, function(err, game) {
+        (async function() {
+            var game = await collections.games.findOne({_id:gameId});
             if(!game) { socket.emit("no game"); return; }
 
             // ensure that the logged-in user has the right to act
@@ -36,33 +37,33 @@ exports.levelUp = function(collections, data, socket, socketList) {
             if(!player || !player.advancingUnit) { return; }
 
             var coords = player.advancingUnit.split(",").map(function(i) { return parseInt(i); });
-            collections.units.findOne({ x:coords[0], y:coords[1], gameId:gameId }, function(err, unit) {
-                unit = new Unit(unit);
+            var unitRecord = await collections.units.findOne({ x:coords[0], y:coords[1], gameId:gameId });
+            var unit = new Unit(unitRecord);
 
-                choiceNum = Math.round(choiceNum);
-                if(choiceNum >= unit.advancesTo.length || choiceNum < 0) { choiceNum = 0; }
+            choiceNum = Math.round(choiceNum);
+            if(choiceNum >= unit.advancesTo.length || choiceNum < 0) { choiceNum = 0; }
 
-                var unit = unit.levelUp(choiceNum);
+            unit = unit.levelUp(choiceNum);
 
-                delete player.advancingUnit;
+            delete player.advancingUnit;
 
-                // continue leveling up with unspent over-max XP
-                while(unit.xp >= unit.maxXp) {
-                    console.log("advanced unit after choice", unit);
-                    var oldXp = unit.xp;
-                    unit = exports.getLevelUp(unit, player, true);
-                    
-                    // if the XP is above leveling threshold but did not decrease, we hit a branching prompt
-                    if(oldXp == unit.xp) { break; }
-                }
+            // continue leveling up with unspent over-max XP
+            while(unit.xp >= unit.maxXp) {
+                console.log("advanced unit after choice", unit);
+                var oldXp = unit.xp;
+                unit = exports.getLevelUp(unit, player, true);
 
-                collections.games.save(game, { safe: true }, function() {
-                    collections.units.save(unit.getStorableObj(), { safe: true }, function() {
-                        io.sockets.in("game"+gameId).emit("leveledup", { x: coords[0], y: coords[1], choiceNum: choiceNum });
-                    });
-                });
+                // if the XP is above leveling threshold but did not decrease, we hit a branching prompt
+                if(oldXp == unit.xp) { break; }
+            }
+
+            await collections.games.replaceOne({ _id: game._id }, game);
+            var storable = unit.getStorableObj();
+            await collections.units.replaceOne({ _id: unitRecord._id }, storable);
+            socketList.filter(function(o) { return o.gameId.equals(gameId); }).forEach(function(o) {
+                o.socket.emit("leveledup", { x: coords[0], y: coords[1], choiceNum: choiceNum });
             });
-        });
+        })();
 };
 
 exports.getLevelUp = function(thisUnit, owner, isOffender) {

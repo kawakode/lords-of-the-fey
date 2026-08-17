@@ -1,0 +1,117 @@
+{
+  "name": "Saurian Augur",
+  "img": "/data/img/units/saurian_augur.png",
+  "cost": 16,
+  "maxHp": 22,
+  "move": 6,
+  "maxXp": 28,
+  "level": 1,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "heals_4"
+  ],
+  "advancesTo": [
+    "saurian_oracle",
+    "saurian_soothsayer"
+  ],
+  "attacks": [
+    {
+      "name": "Staff",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 4,
+      "number": 2,
+      "icon": "/data/img/attacks/staff-magic.png",
+      "animation": [
+        1,
+        6
+      ]
+    },
+    {
+      "name": "Curse",
+      "type": "ranged",
+      "damageType": "cold",
+      "damage": 5,
+      "number": 3,
+      "icon": "/data/img/attacks/curse.png",
+      "properties": [
+        "magical"
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "frozen": {
+      "move": 4,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "mountains": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": -0.1,
+    "pierce": 0.2,
+    "impact": -0.1,
+    "fire": -0.2,
+    "cold": -0.2,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/saurian_augur-sprite.png"
+}

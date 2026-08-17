@@ -1,0 +1,104 @@
+{
+  "name": "Soulless",
+  "img": "/data/img/units/soulless.png",
+  "cost": 13,
+  "maxHp": 28,
+  "move": 4,
+  "maxXp": 50,
+  "level": 1,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "undead"
+  ],
+  "attributeCount": 1,
+  "omittedAttributes": [
+    "intelligent"
+  ],
+  "attacks": [
+    {
+      "name": "Touch",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 7,
+      "number": 3,
+      "icon": "/data/img/attacks/touch-zombie.png",
+      "properties": [
+        "plague"
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": 3,
+      "cover": 0.1
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": 0.3,
+    "impact": -0.1,
+    "fire": -0.2,
+    "cold": 0.6,
+    "arcane": -0.2
+  }
+}

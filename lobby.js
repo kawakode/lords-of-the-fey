@@ -22,6 +22,7 @@ var rooms = {};
 var players = [];
 
 var fs = require("fs");
+var factions = require("./factions");
 
 module.exports.initLobbyListeners = function(sockets, socket, collections, app) {
     var emptySlot = { empty: true };
@@ -213,7 +214,7 @@ console.log(username, "leaving room!");
         var user = socket.request.user;
         if(!user) { return; }
 
-        if(["Elves", "Orcs"].indexOf(data.faction) == -1) { return; }
+        if(data.faction != "Random" && !factions.resolveId(data.faction)) { return; }
 
         if(room.players[data.slot] && (room.players[data.slot].username == user.username || user.username == room.owner)) {
             room.players[data.slot].faction = data.faction;

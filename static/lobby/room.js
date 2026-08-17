@@ -23,6 +23,13 @@ var players;
 var yourUsername;
 var room;
 
+// playable factions, filled in from /data/factions/index.json
+var factionList = [];
+$.getJSON("/data/factions/index.json", function(data) {
+    factionList = data.factions;
+    if(players) { renderPlayerList(); }
+});
+
 socket.emit("enter room", roomId);
 
 socket.on("room data", function(data) {
@@ -94,9 +101,10 @@ function renderPlayerList() {
             playerItem.append($("<td>").append(playerText));
 
             var factionSelector = $("<select>");
-            factionSelector.append('<option value="Random">Random</option>')
-            factionSelector.append('<option value="Elves">Elves</option>')
-            factionSelector.append('<option value="Orcs">Orcs</option>')
+            factionSelector.append($("<option>", { value: "Random", text: "Random" }));
+            factionList.forEach(function(faction) {
+                factionSelector.append($("<option>", { value: faction.name, text: faction.name }));
+            });
             factionSelector.val(data.faction || "Random");
             factionSelector.change(function(slotNum) {
                 socket.emit("set faction", { id: roomId, faction: factionSelector.val(), slot: slotNum });

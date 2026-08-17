@@ -1,0 +1,16 @@
+{
+    "name": "Loyalists",
+    "recruitList": [
+        "spearman",
+        "bowman",
+        "fencer",
+        "heavy_infantryman",
+        "cavalryman",
+        "horseman",
+        "mage",
+        "merman_fighter"
+    ],
+    "commanderList": [
+        "lieutenant"
+    ]
+}

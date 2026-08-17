@@ -50,43 +50,45 @@ To load a new version of this page, you must either delete or modify `/static/cl
         </div>
 
         <!-- start top stats bar -->
-        <div id="top-bar" style="background-color:#555555; border-left: thin black solid; border-right: thin black solid; border-top: thin black solid; padding-right: 1px; top:0; z-index: 100; overflow-x: hidden;">
+        <div id="top-bar">
 
-        <div class="top-status" style="background-color: rgba(0,0,0,0); float: left;">
-          <input type="button" value="Menu" id="top-menu-button" />
+        <div class="top-status top-status-bare">
+          <input type="button" value="Menu" id="top-menu-button" title="Game menu: player info, animation speed, fullscreen, credits" />
         </div>
 
-        <div class="top-status" id="top-active-team">
+        <!-- every plaque carries a data-tip; ui.refreshStatTips() keeps the ones
+             that quote numbers in step with the board -->
+        <div class="top-status" id="top-active-team" data-tip="Whose turn it is.">
           <!--<img src="" class="top-status-img" />-->
           <div id="top-active-color"></div> <span id="top-active-team-text"></span>
         </div>
 
-        <div class="top-status" id="top-turn-count">
-          <img src="/data/img/ui/sand-clock.png" class="top-status-img" />
+        <div class="top-status" id="top-turn-count" data-tip="Time of day. Some units hit harder by day, others by night.">
+          <img src="/data/img/ui/sand-clock.png" class="top-status-img" /> <span id="top-turn-count-text"></span>
         </div>
 
-        <div class="top-status" id="top-gold">
+        <div class="top-status" id="top-gold" data-tip="Your gold.">
           <img src="/data/img/ui/gold.png" class="top-status-img" /> <span id="top-gold-text"></span>
         </div>
 
-        <div class="top-status" style="width: 70px;" id="top-village-count">
+        <div class="top-status" id="top-village-count" data-tip="Villages you hold, out of every village on the map.">
           <img src="/data/img/ui/villages.png" class="top-status-img" /> <span id="top-village-count-text"></span>
         </div>
 
-        <div class="top-status" id="top-unit-count">
+        <div class="top-status" id="top-unit-count" data-tip="Units you have on the field.">
           <img src="/data/img/ui/units.png" class="top-status-img" /> <span id="top-unit-count-text"></span>
         </div>
 
-        <div class="top-status" style="width: 70px;" id="top-upkeep">
+        <div class="top-status" id="top-upkeep" data-tip="Upkeep your villages do not cover, and your paid unit count in brackets.">
           <img src="/data/img/ui/upkeep.png" class="top-status-img" /> <span id="top-upkeep-text"></span>
         </div>
 
-        <div class="top-status" id="top-income">
+        <div class="top-status" id="top-income" data-tip="Gold you collect at the start of your next turn.">
           <img src="/data/img/ui/income.png" class="top-status-img" /> <span id="top-income-text"></span>
         </div>
 
-        <div class="top-status" style="float: right; width:auto; padding: 2px 10px;" id="top-username">
-          
+        <div class="top-status" id="top-username" data-tip="The account you are playing on.">
+
         </div>
 
         <div style="clear:left;"></div>
@@ -113,42 +115,46 @@ To load a new version of this page, you must either delete or modify `/static/cl
         <!-- right status column -->
         <div id="right-column">
 
-        <canvas height="125" width="125" id="minimap"></canvas>
+        <canvas height="125" width="125" id="minimap" title="Minimap: the whole battlefield, with your view box outlined"></canvas>
 
         <img id="right_time_of_day" style="clear: both;">
 
-        <div style="float:left; background-color:#222222; margin-right: 2px;" class="img-wrapper">
+        <div style="float:left; margin-right: 4px;" class="img-wrapper">
           <img id="right_data_image" style="display:block; margin:auto;"/>
         </div>
 
         <div>
+          <!-- no data-tip on this one: hovering already opens the resistance
+               panel, and data-tip would make it the panel's offset parent -->
           <div id="right_data_hp_container">
-            HP<div id="right_data_hp" style="color:green;">&nbsp;</div>
+            HP<div id="right_data_hp" style="color:#7fd06a;">&nbsp;</div>
             <div id="right_data_resistances"></div>
           </div>
-          XP<div id="right_data_xp" style="color:puprle">&nbsp;</div>
+          <div id="right_data_xp_container" data-tip="Experience. At full XP the unit advances to its next level.">
+            XP<div id="right_data_xp" style="color:#c9a0dc;">&nbsp;</div>
+          </div>
         </div>
 
         <div id="right_data_move_container">Move:
           <span id="right_data_move">&nbsp;</span>
           <div id="right_data_move_costs"></div>
         </div>
-        
+
 
         <div style="clear: both; font-weight: bold;" id="right_data_name"></div>
 
-        <div style="clear: both;" id="right_data_attributes"></div>
+        <div style="clear: both;" id="right_data_attributes" data-tip="Traits carried by this unit."></div>
 
-        <div style="clear: both;" id="right_data_attacks"></div>
+        <div style="clear: both;" id="right_data_attacks" data-tip="Attacks: damage per strike, number of strikes, then range and any special properties."></div>
 
-        <input type="button" id="end-turn-button" value="End Turn" disabled="disabled">
+        <input type="button" id="end-turn-button" value="End Turn" disabled="disabled" title="End your turn and hand the board to the next side">
 
         </div>
         <!-- right status column end -->
 
         <div id="player-overlay"></div>
         <div id="credits-overlay">
-            <div style="margin-bottom: 10px;">Lords of the Fey client - Copyright (c) 2014, 2015 <a href="https://apsillers.github.io/">Andrew Sillers</a></div>
+            <div style="margin-bottom: 10px;">Lords of the Fey client - Copyright (c) 2014, 2015 <a href="https://apsillers.github.io/">Andrew Sillers</a>, with contributions by <a href="https://github.com/KawaKode">Kawa</a></div>
             <div style="margin-bottom: 10px;">Client licensed under the <a href="COPYING">Affero GNU Puplic License (AGPL), version 3</a></div>
             <div>Libraries used under the MIT License:</div>
             <ul>
@@ -160,28 +166,34 @@ To load a new version of this page, you must either delete or modify `/static/cl
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br/>
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br/></div>
-            <div><button id="close-credits">Close</div></div>
+            <div><button id="close-credits">Close</button></div>
         </div>
 
         <canvas id="c"></canvas>
 
         
 
-        <div id="recruit-prompt" style="display:none; background-color:#DDD;">
-          <div id="recruit-list" style="overflow-y: auto; float:left; width: 270px; height:100%;"></div>
-          <div id="recruit-stats" style="background-color: #AAA; width: 110px; height: 300px; padding: 0 10px; float: right;">
-            <img id="recruit-stats-img"><br/>
-            HP: <span id="recruit-stats-hp"></span><br/>
-            XP: <span id="recruit-stats-xp"></span><br/>
-            Move: <span id="recruit-stats-move"></span><br/><br/>
-            <div id="recruit-stats-attacks"></div><br/>
+        <div id="recruit-prompt" style="display:none;">
+          <!-- list and stats share a row; the cancel strip sits under both, so
+               the prompt lays itself out as a column (see play.css) -->
+          <div id="recruit-body">
+            <div id="recruit-list"></div>
+            <div id="recruit-stats">
+              <!-- animated units are drawn from a sprite sheet, so the picture is
+                   clipped to a single frame -->
+              <div class="img-wrapper"><img id="recruit-stats-img"></div>
+              HP: <span id="recruit-stats-hp"></span><br/>
+              XP: <span id="recruit-stats-xp"></span><br/>
+              Move: <span id="recruit-stats-move"></span><br/><br/>
+              <div id="recruit-stats-attacks"></div><br/>
+            </div>
           </div>
-          <div style="clear: both;"></div>
-          <div id="recruit-cancel" style="background-color: #AAA;"></div>
+          <div id="recruit-cancel"></div>
         </div>
 
-        <div id="attack-prompt" style="display:none; background-color:#DDD;">
+        <div id="attack-prompt" style="display:none;">
           <div id="attack-combatants"></div>
+          <div id="attack-resistances"></div>
           <table id="attack-list" cellspacing=0></table>
           <div style="clear: both;"></div>
           <div id="attack-cancel"></div>

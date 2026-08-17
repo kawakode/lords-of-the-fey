@@ -1,0 +1,108 @@
+{
+  "name": "Cavalryman",
+  "img": "/data/img/units/cavalryman.png",
+  "cost": 17,
+  "maxHp": 34,
+  "move": 8,
+  "maxXp": 44,
+  "level": 1,
+  "alignment": "lawful",
+  "advancesTo": [
+    "dragoon"
+  ],
+  "attacks": [
+    {
+      "name": "Sword",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 6,
+      "number": 3,
+      "icon": "/data/img/attacks/sword-human.png",
+      "animation": [
+        1,
+        7
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "reef": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 3,
+      "cover": 1.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 4,
+      "cover": 1.8
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": -0.2,
+    "impact": 0.4,
+    "fire": 0.0,
+    "cold": 0.2,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/cavalryman-sprite.png",
+  "animations": {
+    "die": [
+      8,
+      8
+    ]
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "name": "General",
+  "img": "/data/img/units/general.png",
+  "cost": 66,
+  "maxHp": 55,
+  "move": 6,
+  "maxXp": 105,
+  "level": 3,
+  "alignment": "lawful",
+  "fixedAttributes": [
+    "leadership"
+  ],
+  "advancesTo": [
+    "grand_marshal"
+  ],
+  "attacks": [
+    {
+      "name": "Longsword",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 9,
+      "number": 4,
+      "icon": "/data/img/attacks/greatsword-human.png",
+      "animation": [
+        1,
+        7
+      ]
+    },
+    {
+      "name": "Crossbow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 10,
+      "number": 2,
+      "icon": "/data/img/attacks/crossbow-human.png",
+      "animation": [
+        8,
+        11
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": 0.1,
+    "impact": 0.1,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/general-sprite.png"
+}

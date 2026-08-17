@@ -1,0 +1,112 @@
+{
+  "name": "Outlaw",
+  "img": "/data/img/units/outlaw.png",
+  "cost": 24,
+  "maxHp": 47,
+  "move": 7,
+  "maxXp": 71,
+  "level": 2,
+  "alignment": "chaotic",
+  "advancesTo": [
+    "fugitive"
+  ],
+  "attacks": [
+    {
+      "name": "Morning star",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 8,
+      "number": 2,
+      "animation": [
+        1,
+        3
+      ]
+    },
+    {
+      "name": "Sling",
+      "type": "ranged",
+      "damageType": "impact",
+      "damage": 6,
+      "number": 3,
+      "animation": [
+        4,
+        6
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": -0.3,
+    "pierce": -0.2,
+    "impact": -0.2,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/outlaw-sprite.png"
+}

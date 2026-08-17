@@ -1,0 +1,139 @@
+{
+  "name": "Lich",
+  "img": "/data/img/units/lich.png",
+  "cost": 90,
+  "maxHp": 60,
+  "move": 6,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "undead"
+  ],
+  "attributeCount": 1,
+  "omittedAttributes": [
+    "intelligent"
+  ],
+  "attacks": [
+    {
+      "name": "Touch",
+      "type": "melee",
+      "damageType": "arcane",
+      "damage": 8,
+      "number": 3,
+      "icon": "/data/img/attacks/touch-undead.png",
+      "properties": [
+        "drains"
+      ],
+      "animation": [
+        1,
+        5
+      ]
+    },
+    {
+      "name": "Chill tempest",
+      "type": "ranged",
+      "damageType": "cold",
+      "damage": 12,
+      "number": 3,
+      "icon": "/data/img/attacks/iceball.png",
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        6,
+        10
+      ]
+    },
+    {
+      "name": "Shadow wave",
+      "type": "ranged",
+      "damageType": "arcane",
+      "damage": 9,
+      "number": 3,
+      "icon": "/data/img/attacks/dark-missile.png",
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        11,
+        17
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": 3,
+      "cover": 0.1
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": 0.3,
+    "impact": -0.1,
+    "fire": -0.2,
+    "cold": 0.6,
+    "arcane": -0.4
+  },
+  "sprite": "/data/img/units/lich-sprite.png"
+}

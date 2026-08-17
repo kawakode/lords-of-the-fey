@@ -1,0 +1,105 @@
+{
+  "name": "Dwarvish Berserker",
+  "img": "/data/img/units/dwarvish_berserker.png",
+  "cost": 30,
+  "maxHp": 48,
+  "move": 5,
+  "maxXp": 100,
+  "level": 2,
+  "alignment": "neutral",
+  "attributePool": [
+    "healthy"
+  ],
+  "attacks": [
+    {
+      "name": "Berserker frenzy",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 7,
+      "number": 4,
+      "icon": "/data/img/attacks/frenzy.png",
+      "properties": [
+        "berserk"
+      ],
+      "animation": [
+        1,
+        27
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": 0.2,
+    "impact": 0.2,
+    "fire": 0.1,
+    "cold": 0.1,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/dwarvish_berserker-sprite.png"
+}

@@ -20,9 +20,9 @@ var config = require("./config");
 var express = require('express')
   , app = express()
   , server = app.listen(config.port, config.listeningIP);
-var MongoClient = require('mongodb').MongoClient
-  , Server = require('mongodb').Server
-, ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return require('mongodb').ObjectID.apply(this, arguments); }
+var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectId;
+ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
 var fs = require('fs');
 var io = require('socket.io')(server);
 var passport = require("passport");
@@ -31,35 +31,7 @@ var initLobbyListeners = require("./lobby").initLobbyListeners;
 var Unit = require("./static/shared/unit.js").Unit;
 var unitLib = require("./static/shared/unit.js").unitLib;
 var socketList = [];
-
-new MongoClient.connect(config.mongoString, function(err, mongo) {
-    var collections = {};
-
-    mongo.collection("games", function(err, gamesCollection) {
-        mongo.collection("units", function(err, unitsCollection) {
-            mongo.collection("users", function(err, usersCollection) {
-                collections.games = gamesCollection;
-                collections.units = unitsCollection;
-                collections.users = usersCollection;
-            });
-        });
-    });
-
-    require("./auth").initAuth(app, mongo, collections);
-    require("./gameList").initListing(app, collections);
-
-    app.get("/", function(req, res) {
-        var user = req.user || {};
-        res.render("index", { username: user.username });
-    });
-
-    unitLib.init(function() {
-        io.sockets.on('connection', function (socket) {
-            initListeners(socket, collections);
-        });
-    });
-
-});
+var collections = {};
 
 app.set('view engine', 'hbs');
 express.static.mime.define({'text/html': ['hbs'], 'text/cache-manifest': ['appcache']});
@@ -69,9 +41,10 @@ app.use(express.static(__dirname + '/static'));
 app.use(require("cookie-parser")());
 app.use(require("body-parser")({ extended: true }));
 
-var MongoStore = require('connect-mongo')(require("express-session"));
-var mongoStore = new MongoStore({ url: config.mongoString });
-app.use(require("express-session")({
+var MongoStore = require('connect-mongo');
+var sessionMiddleware = require("express-session");
+var mongoStore = new MongoStore({ mongoUrl: config.mongoString });
+app.use(sessionMiddleware({
     store: mongoStore,
     secret: config.sessionSecret,
     saveUninitialized: true,
@@ -82,11 +55,41 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 mongoStore.on('connect', function() {
-    console.log('Store is ready to use')
+    console.log('Session store connected');
 });
 
 mongoStore.on('error', function(err) {
-    console.log('Do not ignore me', err)
+    console.error('Session store error:', err);
+});
+
+app.get("/", function(req, res) {
+    var user = req.user || {};
+    res.render("index", { username: user.username });
+});
+
+require("./auth").initAuth(app, collections);
+require("./gameList").initListing(app, collections);
+
+var mongoUrl = new URL(config.mongoString);
+console.log('Connecting to MongoDB at', mongoUrl.hostname + (mongoUrl.port ? ':' + mongoUrl.port : '') + mongoUrl.pathname);
+var mongoClient = new MongoClient(config.mongoString);
+mongoClient.connect().then(function() {
+    console.log('Connected to MongoDB successfully');
+    var mongo = mongoClient.db('lotf');
+
+    collections.games = mongo.collection("games");
+    collections.units = mongo.collection("units");
+    collections.users = mongo.collection("users");
+
+    unitLib.init(function() {
+        io.sockets.on('connection', function (socket) {
+            initListeners(socket, collections);
+        });
+        console.log('Server fully initialized');
+    });
+}).catch(function(err) {
+    console.error('Failed to connect to MongoDB:', err);
+    process.exit(1);
 });
 
 var passportSocketIo = require("passport.socketio");
@@ -123,38 +126,35 @@ io.use(passportSocketIo.authorize({
 function initListeners(socket, collections) {
     initLobbyListeners(io.sockets, socket, collections);
 
-    socket.on("anon auth", function(data) {
-        collections.games.findOne({ _id:ObjectID(data.gameId) }, function(err, game) {
-            if(!game) { socket.emit("no game"); return; }
-            if(data.anonToken) { var player = game.players.filter(function(p) { return p.anonToken == data.anonToken })[0]; }
-            if(player) {
-                socket.request.user = { username: player.username };
-            }
-            socket.emit("anon auth done");
-        });
+    socket.on("anon auth", async function(data) {
+        var game = await collections.games.findOne({ _id:ObjectID(data.gameId) });
+        if(!game) { socket.emit("no game"); return; }
+        if(data.anonToken) { var player = game.players.filter(function(p) { return p.anonToken == data.anonToken })[0]; }
+        if(player) {
+            socket.request.user = { username: player.username };
+        }
+        socket.emit("anon auth done");
     });
 
     // request for all game data
-    socket.on("alldata", function(data) {
+    socket.on("alldata", async function(data) {
         console.log("serving data to", socket.request.user.username);
         var gameId = ObjectID(data.gameId);
         var user = socket.request.user;
 
-        collections.units.find({ gameId:gameId }, function(err, cursor) {
-            collections.games.findOne({ _id:gameId }, function(err, game) {
-                if(!game) { socket.emit("no game"); return; }
-                var player = game.players.filter(function(p) { return p.username == user.username })[0];
-                var players = game.players.map(function(p) {
-                    var ret = { username: p.username, team: p.team, alliance: p.alliance };
-                    if(player && player.team == 1) { ret.anonToken = p.anonToken; }
-                    return ret;
-                });
-                cursor.toArray(function(err, units) {
-                    units = units.filter(function(u) { return !u.conditions || u.conditions.indexOf("hidden")==-1 || u.team==(player||{}).team; });
-                    socket.emit("initdata", {map: game.map, units: units, player: player, players: players, activeTeam: game.activeTeam, villages:game.villages, timeOfDay: game.timeOfDay, alliances: game.alliances });
-                });
-            });
+        var game = await collections.games.findOne({ _id:gameId });
+        if(!game) { socket.emit("no game"); return; }
+        var player = game.players.filter(function(p) { return p.username == user.username })[0];
+        var players = game.players.map(function(p) {
+            // the client needs everyone's faction so it can work out which unit
+            // images this game will actually use
+            var ret = { username: p.username, team: p.team, alliance: p.alliance, faction: p.faction };
+            if(player && player.team == 1) { ret.anonToken = p.anonToken; }
+            return ret;
         });
+        var units = await collections.units.find({ gameId:gameId }).toArray();
+        units = units.filter(function(u) { return !u.conditions || u.conditions.indexOf("hidden")==-1 || u.team==(player||{}).team; });
+        socket.emit("initdata", {map: game.map, units: units, player: player, players: players, activeTeam: game.activeTeam, villages:game.villages, timeOfDay: game.timeOfDay, alliances: game.alliances, over: !!game.over, winner: game.winner });
     });
 
     // subscribe to a game channel

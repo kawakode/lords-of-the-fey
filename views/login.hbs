@@ -19,25 +19,44 @@
 -->
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Log In</title>
-  <link rel="stylesheet" type="text/css" href="/css/login.css" />
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
   <link rel="stylesheet" type="text/css" href="/css/mainmenu.css" />
+  <link rel="stylesheet" type="text/css" href="/css/login.css" />
 </head>
-<body style="margin:0; padding:0;">
+<body class="fey-page">
 
 {{> menuheader}}
-<div class="main-content" style="padding: 5px; text-align: center;">
-{{#if error}}<div style="border:thin solid red; color: red;">{{error}}</div>{{/if}}
+<div class="main-content fey-shell">
+
+<h1 class="fey-title">Return to the Field</h1>
+<div class="fey-rule"><span></span></div>
+
+{{#if error}}<div class="fey-error" style="max-width: 430px;">{{error}}</div>{{/if}}
+
+<div class="fey-panel fey-panel-parchment fey-auth">
+<div class="fey-panel-heading">Muster roll</div>
 <form action="/login" method="post">
-<label for="username">Username</label><input name="username" id="username" autofocus="true"><br>
-<label for="password">Password</label><input type="password" id="password" name="password"><br>
-<input type="submit" value="Log in">
+<div class="fey-field">
+  <label for="username">Username</label><input name="username" id="username" autofocus="true" autocomplete="username">
+</div>
+<div class="fey-field">
+  <label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password">
+</div>
+<div class="fey-form-actions">
+  <input type="submit" class="fey-button-primary" value="Log in">
+</div>
 </form>
+</div>
+
+<div class="fey-auth-switch">No banner yet? <a href="/signup.html">Sign up</a></div>
+
 <div id="authlist">
-<hr>
-{{#if config.facebook.enabled}}<div class="authbox"><a href="/login/facebook"><img style="" src="/data/oauth/facebook.png" title="Log in with Facebook" alt="Log in with Facebook"><br>Log in with Facebook</a></div>{{/if}}
-{{#if config.twitter.enabled}}<div class="authbox"><a href="/login/twitter"><img style="height: 100px; width: 100px; background-color: #ccd6dd; border-radius: 5px;" src="/data/oauth/twitter.png" title="Log in with Twitter" alt="Log in with Twitter"><br>Log in with Twitter</a></div>{{/if}}
-{{#if config.google.enabled}}<div class="authbox"><a href="/auth/google"><img style="height: 100px; width: 100px; background-color: #dd4b39; border-radius: 5px;" src="/data/oauth/google.png" title="Log in with Google" alt="Log in with Google"><br>Log in with Google</a></div>{{/if}}
+{{#if config.facebook.enabled}}<div class="authbox"><a href="/login/facebook"><img src="/data/oauth/facebook.png" title="Log in with Facebook" alt="Log in with Facebook">Facebook</a></div>{{/if}}
+{{#if config.twitter.enabled}}<div class="authbox"><a href="/login/twitter"><img style="background-color: #ccd6dd;" src="/data/oauth/twitter.png" title="Log in with Twitter" alt="Log in with Twitter">Twitter</a></div>{{/if}}
+{{#if config.google.enabled}}<div class="authbox"><a href="/auth/google"><img style="background-color: #dd4b39;" src="/data/oauth/google.png" title="Log in with Google" alt="Log in with Google">Google</a></div>{{/if}}
 </div>
 </div>
 </body>

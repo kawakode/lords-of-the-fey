@@ -1,28 +1,28 @@
 module.exports = {
-    "mongoString":"mongodb://mongoUser:mongoPasswrd@mongodb.example.com:27017/databaseName",
+    "mongoString": process.env.MONGO_STRING || "mongodb://localhost:27017",
 
-    "port": "8080",
-    "listeningIP":"0.0.0.0",
+    "port": process.env.PORT || "8080",
+    "listeningIP": process.env.LISTENING_IP || "0.0.0.0",
 
-    "sessionSecret":"!! <replace this with a random secret> !!",
+    "sessionSecret": process.env.SESSION_SECRET || "!! <replace this with a random secret> !!",
 
-    "origin":"http://example.com:8080",
+    "origin": process.env.ORIGIN || "http://localhost:8080",
 
     "facebook": {
-        "enabled": false,
-        "app_id":"<use tokens from https://developers.facebook.com>",
-	"app_secret":"<use tokens from https://developers.facebook.com>"
+        "enabled": process.env.FACEBOOK_ENABLED === "true" || false,
+        "app_id": process.env.FACEBOOK_APP_ID || "<use tokens from https://developers.facebook.com>",
+        "app_secret": process.env.FACEBOOK_APP_SECRET || "<use tokens from https://developers.facebook.com>"
     },
     "twitter": {
-        "enabled": false,
-        "consumer_key":"<use tokens from https://apps.twitter.com>",
-	"consumer_secret":"<use tokens from https://apps.twitter.com>"
+        "enabled": process.env.TWITTER_ENABLED === "true" || false,
+        "consumer_key": process.env.TWITTER_CONSUMER_KEY || "<use tokens from https://apps.twitter.com>",
+        "consumer_secret": process.env.TWITTER_CONSUMER_SECRET || "<use tokens from https://apps.twitter.com>"
     },
     "google": {
-        "enabled": false,
-        "clientID": "<use tokens from https://console.developers.google.com>",
-        "clientSecret": "<use tokens from https://console.developers.google.com>"
+        "enabled": process.env.GOOGLE_ENABLED === "true" || false,
+        "clientID": process.env.GOOGLE_CLIENT_ID || "<use tokens from https://console.developers.google.com>",
+        "clientSecret": process.env.GOOGLE_CLIENT_SECRET || "<use tokens from https://console.developers.google.com>"
     },
 
-    "sourceLink":"https://github.com/apsillers/lords-of-the-fey"
+    "sourceLink": "https://github.com/apsillers/lords-of-the-fey"
 }

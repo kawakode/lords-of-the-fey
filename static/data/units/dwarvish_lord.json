@@ -1,0 +1,125 @@
+{
+  "name": "Dwarvish Lord",
+  "img": "/data/img/units/dwarvish_lord.png",
+  "cost": 69,
+  "maxHp": 74,
+  "move": 4,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "neutral",
+  "attributePool": [
+    "healthy"
+  ],
+  "attacks": [
+    {
+      "name": "Battle axe",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 15,
+      "number": 3,
+      "icon": "/data/img/attacks/battleaxe.png",
+      "animation": [
+        1,
+        10
+      ]
+    },
+    {
+      "name": "Hammer",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 19,
+      "number": 2,
+      "icon": "/data/img/attacks/hammer-dwarven.png",
+      "animation": [
+        11,
+        18
+      ]
+    },
+    {
+      "name": "Hatchet",
+      "type": "ranged",
+      "damageType": "blade",
+      "damage": 10,
+      "number": 1,
+      "animation": [
+        19,
+        25
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.4,
+    "pierce": 0.3,
+    "impact": 0.3,
+    "fire": 0.1,
+    "cold": 0.1,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/dwarvish_lord-sprite.png"
+}

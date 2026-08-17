@@ -1,0 +1,122 @@
+{
+  "name": "Drake Thrasher",
+  "img": "/data/img/units/drake_thrasher.png",
+  "cost": 32,
+  "maxHp": 66,
+  "move": 5,
+  "maxXp": 77,
+  "level": 2,
+  "alignment": "lawful",
+  "advancesTo": [
+    "drake_enforcer"
+  ],
+  "attacks": [
+    {
+      "name": "War talon",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 8,
+      "number": 4,
+      "icon": "/data/img/attacks/scimitar.png",
+      "animation": [
+        1,
+        8
+      ]
+    },
+    {
+      "name": "Spear",
+      "type": "melee",
+      "damageType": "pierce",
+      "damage": 6,
+      "number": 5,
+      "icon": "/data/img/attacks/spear.png"
+    },
+    {
+      "name": "Ram",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 10,
+      "number": 3,
+      "icon": "/data/img/attacks/ram.png",
+      "animation": [
+        9,
+        15
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "frozen": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": 0.0,
+    "impact": 0.3,
+    "fire": 0.5,
+    "cold": -0.5,
+    "arcane": -0.2
+  },
+  "sprite": "/data/img/units/drake_thrasher-sprite.png"
+}

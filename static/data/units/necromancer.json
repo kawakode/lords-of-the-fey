@@ -1,0 +1,133 @@
+{
+  "name": "Necromancer",
+  "img": "/data/img/units/necromancer.png",
+  "cost": 90,
+  "maxHp": 64,
+  "move": 5,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "chaotic",
+  "attacks": [
+    {
+      "name": "Plague staff",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 7,
+      "number": 3,
+      "icon": "/data/img/attacks/staff-plague.png",
+      "properties": [
+        "plague"
+      ],
+      "animation": [
+        1,
+        5
+      ]
+    },
+    {
+      "name": "Chill wave",
+      "type": "ranged",
+      "damageType": "cold",
+      "damage": 20,
+      "number": 2,
+      "icon": "/data/img/attacks/iceball.png",
+      "properties": [
+        "magical"
+      ],
+      "animation": [
+        6,
+        10
+      ]
+    },
+    {
+      "name": "Shadow wave",
+      "type": "ranged",
+      "damageType": "arcane",
+      "damage": 13,
+      "number": 2,
+      "icon": "/data/img/attacks/dark-missile.png",
+      "properties": [
+        "magical",
+        "plague"
+      ],
+      "animation": [
+        11,
+        17
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.1,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/necromancer-sprite.png"
+}

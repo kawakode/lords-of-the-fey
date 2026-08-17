@@ -1,0 +1,105 @@
+{
+  "name": "Heavy Infantryman",
+  "img": "/data/img/units/heavy_infantryman.png",
+  "cost": 19,
+  "maxHp": 38,
+  "move": 4,
+  "maxXp": 40,
+  "level": 1,
+  "alignment": "lawful",
+  "fixedAttributes": [
+    "fearless"
+  ],
+  "advancesTo": [
+    "shock_trooper"
+  ],
+  "attacks": [
+    {
+      "name": "Mace",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 11,
+      "number": 2,
+      "icon": "/data/img/attacks/mace-spiked.png",
+      "animation": [
+        1,
+        16
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "frozen": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "shallow_water": {
+      "move": 4,
+      "cover": 0.1
+    },
+    "swamp": {
+      "move": 4,
+      "cover": 0.1
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.5,
+    "pierce": 0.4,
+    "impact": 0.1,
+    "fire": -0.1,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/heavy_infantryman-sprite.png"
+}

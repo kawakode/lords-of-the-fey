@@ -16,66 +16,351 @@
     You should have received a copy of the GNU Affero General Public License
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
-html, body {
-    height: 100%;
-    margin: 0;
+
+/* The lobby and the war room: a tavern hall of stone tables and wooden boards. */
+
+/* ------------------------------- layout ------------------------------- */
+
+#lobby-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-div#player-list {
-    width: 200px;
-    background-color: #000;
-    color: #FFF;
-    height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    padding-top: 5px;
-    padding-left: 10px;
-    float: left;
-    margin-right: 10px;
-}
-
-#game-list {
-    height: 100%;
-    width: 500px;
+#lobby-menu .fey-lobby-title {
+    flex: 1;
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.85);
 }
 
 #lobby-below-menu {
-    height: 500px;
-    margin-bottom: 10px;
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    height: 440px;
+    margin-bottom: 16px;
+}
+
+/* ------------------------------- roster ------------------------------- */
+
+div#player-list {
+    width: 230px;
+    flex: 0 0 230px;
+    height: auto;
+    margin: 0;
+    padding: 0 0 8px 0;
+    float: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: var(--parchment);
+}
+
+div#player-list::before {
+    content: "Company present";
+    display: block;
+    margin-bottom: 8px;
+    padding: 9px 14px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    background-image: linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border-bottom: 2px solid var(--wood-darkest);
+    box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+}
+
+div#player-list > div {
+    position: relative;
+    margin: 2px 10px;
+    padding: 7px 8px 7px 26px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+div#player-list > div::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    margin-top: -6px;
+    width: 10px;
+    height: 12px;
+    background: var(--moss-light);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+/* ------------------------------ room list ------------------------------ */
+
+#room-list {
+    flex: 1;
+    height: auto;
+    width: auto;
+    margin: 0;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+#room-list:empty::after {
+    content: "No war councils are gathered. Raise your own banner.";
+    display: block;
+    padding: 26px 10px;
+    font-style: italic;
+    text-align: center;
+    color: var(--parchment-shade);
 }
 
 #room-list div {
+    padding: 14px 16px 14px 42px;
+    position: relative;
+    margin-bottom: 8px;
     cursor: pointer;
-    padding: 10px;
+    font-size: 16px;
+    color: var(--parchment);
+    background-image: linear-gradient(170deg, #4c4740 0%, #35322b 55%, #24211c 100%);
+    border: 2px solid var(--stone);
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
+#room-list div::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    margin-top: -8px;
+    width: 14px;
+    height: 16px;
+    background: var(--gold-dim);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+#room-list div:hover {
+    color: #fff4d2;
+    border-color: var(--gold-dim);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 0 16px rgba(195, 155, 40, 0.35);
+}
+
+/* -------------------------------- chat -------------------------------- */
+
+#chat {
+    max-width: none;
+}
+
+#chat-messages {
+    height: 130px;
+    padding: 10px 12px;
+    overflow-y: auto;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--parchment);
+    background: rgba(10, 7, 4, 0.62);
+    border: 2px solid var(--stone);
+    border-radius: 3px 3px 0 0;
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+#chat-messages > div {
+    padding: 1px 0;
+}
+
+#chat-messages span:first-child {
+    color: var(--gold-light);
+}
+
+#chat-input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-width: 0;
+    border-radius: 0 0 3px 3px;
+}
+
+#chat::before {
+    content: "Hall talk";
+    display: block;
+    margin-bottom: 6px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+}
+
+/* --------------------------- create-room dialog --------------------------- */
+
+#create-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    background: rgba(8, 5, 2, 0.78);
+}
+
+#create-dialog-inner {
+    width: 420px;
+    max-width: 92%;
+    margin: 8vh auto 0 auto;
+    padding: 22px 24px;
+    color: var(--ink);
+    background-color: var(--parchment);
+    background-image:
+        radial-gradient(circle at 14% 18%, rgba(120, 92, 46, 0.12) 0 18%, rgba(0, 0, 0, 0) 19%),
+        linear-gradient(165deg, #f2e7c8 0%, var(--parchment) 45%, var(--parchment-shade) 100%);
+    border: 2px solid var(--parchment-edge);
+    box-shadow: inset 0 0 30px rgba(120, 92, 46, 0.28),
+                0 0 0 1px var(--wood-darkest),
+                0 0 0 5px var(--wood),
+                0 0 0 6px var(--wood-darkest),
+                0 14px 34px rgba(0, 0, 0, 0.65);
+}
+
+#create-dialog-inner > div {
+    margin-bottom: 14px;
+}
+
+#create-dialog-inner .fey-dialog-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin: -22px -24px 18px -24px;
+    padding: 10px 20px;
+    font-family: var(--font-display);
+    font-size: 17px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+    background-image: linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border-bottom: 2px solid var(--wood-darkest);
+}
+
+#create-dialog-inner .fey-dialog-hint {
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--parchment-shade);
+    text-shadow: none;
+}
+
+#create-dialog-inner label,
+#create-dialog-inner .fey-dialog-label {
+    display: block;
+    margin-bottom: 5px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+#create-dialog-name,
+#create-dialog-map {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+#create-dialog-inner .fey-dialog-actions {
+    margin: 20px 0 0 0;
+    text-align: right;
+}
+
+/* ------------------------------ war room ------------------------------ */
+
+#room-container {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 #room-player-list {
     border-collapse: collapse;
-    width: 75%;
+    width: 100%;
+    margin-bottom: 6px;
+    font-family: var(--font-body);
+    background: rgba(10, 7, 4, 0.45);
 }
 
-#room-player-list td, select, input, #create-dialog {
-    font-size: 20px;
-    font-family: sans-serif;
+#room-player-list th {
+    height: 42px;
+    padding: 0 8px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    background-image: linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border-bottom: 2px solid var(--wood-darkest);
 }
+
 #room-player-list td {
-    padding: 0px 5px;
-    height: 50px;
+    height: 54px;
+    padding: 4px 8px;
+    font-size: 16px;
+    color: var(--parchment);
     text-align: center;
 }
-#room-player-list th {
-    height: 50px;
-}
+
 #room-player-list tr {
-    border-bottom: thin solid black;
-}
-select, button {
-    padding: 5px;
+    border-bottom: 1px solid rgba(147, 140, 124, 0.35);
 }
 
-input[type=checkbox] {
-    height: 15px;
-    width: 15px;
-    margin-right: 7px;
+#room-player-list tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.03);
 }
 
+#room-player-list td.empty {
+    color: var(--stone-light);
+    font-style: italic;
+    letter-spacing: 0.08em;
+}
+
+#room-player-list select {
+    font-size: 15px;
+}
+
+#room-player-list a {
+    color: var(--blood-light);
+}
+
+.fey-room-actions {
+    display: flex;
+    gap: 10px;
+    margin: 14px 0 18px 0;
+    flex-wrap: wrap;
+}
+
+#room-player-list input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+@media (max-width: 780px) {
+    #lobby-below-menu {
+        display: block;
+        height: auto;
+    }
+
+    div#player-list {
+        width: auto;
+        margin-bottom: 14px;
+        max-height: 200px;
+    }
+
+    #room-list {
+        min-height: 160px;
+    }
+}

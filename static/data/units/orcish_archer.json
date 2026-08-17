@@ -6,61 +6,130 @@
   "move": 5,
   "maxXp": 30,
   "level": 1,
-  "alignment":"chaotic",
-  "advancesTo": ["orcish_crossbowman"],
+  "alignment": "chaotic",
+  "advancesTo": [
+    "orcish_crossbowman"
+  ],
   "terrain": {
-    "castle":        { "move": 1, "cover":0.6 },
-    "cave":          { "move": 2, "cover":0.4 },
-    "reef":          { "move": 2, "cover":0.3 },
-    "deep_water":    { "move":-1, "cover":0.0 },
-    "flat":          { "move": 1, "cover":0.4 },
-    "forest":        { "move": 2, "cover":0.5 },
-    "frozen":        { "move": 2, "cover":0.2 },
-    "hills":         { "move": 1, "cover":0.5 },
-    "mountains":     { "move": 2, "cover":0.6 },
-    "fungus":        { "move": 3, "cover":0.4 },
-    "sand":          { "move": 2, "cover":0.3 },
-    "shallow_water": { "move": 3, "cover":0.2 },
-    "swamp":         { "move": 3, "cover":0.4 },
-    "unwalkable":    { "move":-1, "cover":0.0 },
-    "village":       { "move": 1, "cover":0.6 },
-    "impassable":    { "move":-1, "cover":0.0 }
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0.0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0.0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0.0
+    }
   },
   "attributeCount": 2,
-  "attacks":[
+  "attacks": [
     {
-      "name":"Dagger",
-      "type":"melee",
-      "damageType":"blade",
-      "damage":3,
-      "number":2,
-      "icon": "/data/img/attacks/sword-orcish.png"
+      "name": "Dagger",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 3,
+      "number": 2,
+      "icon": "/data/img/attacks/sword-orcish.png",
+      "animation": [
+        1,
+        8
+      ]
     },
     {
-      "name":"Bow",
-      "type":"ranged",
-      "damageType":"pierce",
-      "damage":6,
-      "number":3,
+      "name": "Bow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 6,
+      "number": 3,
       "icon": "/data/img/attacks/bow-orcish.png",
-      "img": { "n":"/data/img/projectiles/missile-n.png", "ne":"/data/img/projectiles/missile-ne.png" }
+      "img": {
+        "n": "/data/img/projectiles/missile-n.png",
+        "ne": "/data/img/projectiles/missile-ne.png"
+      },
+      "animation": [
+        9,
+        14
+      ]
     },
     {
-      "name":"Bow",
-      "type":"ranged",
-      "damageType":"fire",
-      "damage":7,
-      "number":2,
+      "name": "Bow",
+      "type": "ranged",
+      "damageType": "fire",
+      "damage": 7,
+      "number": 2,
       "icon": "/data/img/attacks/bow-orcish.png",
-      "img": { "n":"/data/img/projectiles/missile-fire-n.png", "ne":"/data/img/projectiles/missile-fire-ne.png" }
+      "img": {
+        "n": "/data/img/projectiles/missile-fire-n.png",
+        "ne": "/data/img/projectiles/missile-fire-ne.png"
+      },
+      "animation": [
+        15,
+        20
+      ]
     }
   ],
   "resistances": {
     "arcane": 0.0,
-    "blade":  0.0,
-    "cold":   0.0,
-    "fire":   0.0,
+    "blade": 0.0,
+    "cold": 0.0,
+    "fire": 0.0,
     "impact": 0.0,
     "pierce": 0.0
-  }
+  },
+  "sprite": "/data/img/units/orcish_archer-sprite.png"
 }

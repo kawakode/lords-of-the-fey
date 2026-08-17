@@ -18,6 +18,11 @@
 */
 function World(canvasName) {
     var stage = this.stage = new createjs.Stage(canvasName);
+
+    // draw every display object on whole-pixel boundaries; fractional positions
+    // make terrain tiles and unit sprites blur under the canvas' bilinear filter
+    stage.snapToPixelEnabled = true;
+
     createjs.Ticker.on("tick", function (event) {
         stage.update(event);
     });
@@ -55,6 +60,9 @@ function World(canvasName) {
     });
 
 }
+/** shortest board we draw, so the sidebar's controls always have room */
+World.MIN_BOARD_HEIGHT = 470;
+
 World.prototype = {
     initGrid: function(mapDict) {
         this.maxX = 0;
@@ -68,7 +76,7 @@ World.prototype = {
             this.maxY = Math.max(this.maxY, +coords[1]);
         }
 
-        this.mapWidth = Space.WIDTH + ((Space.WIDTH * 3/4 + 0.6) * (this.maxX));
+        this.mapWidth = Space.WIDTH + Space.COLUMN_WIDTH * this.maxX;
         this.mapHeight = Space.HEIGHT * (this.maxY + 1.5);
 
         this.drawTransitions();
@@ -89,15 +97,36 @@ World.prototype = {
     },
 
     resizeCanvasToWindow: function() {
-        this.stage.canvas.height = $(window).height() - $("#top-bar").height() - 6;
-        this.stage.canvas.height = Math.max(this.stage.canvas.height, $("#right-column").height());
-        this.stage.canvas.width = $(window).width() - $("#right-column").width() - 21;
-        $("#top-bar").width($(window).width() - 3);
+        // Lay the board out twice: the first pass can add or remove the window's
+        // scrollbar, which changes the very width it measured. The second pass
+        // settles on the final number.
+        this.fitBoardToWindow();
+        this.fitBoardToWindow();
 
         ui.resizeModalWallToCanvas();
         this.stage.update();
 
         if(this.minimap) { minimap.drawViewBox(); }
+    },
+
+    /**
+       Size the canvas and the sidebar to the window as it measures right now.
+       The chrome is measured as it is actually drawn (borders and padding
+       included) so restyling the bar or the sidebar cannot push the canvas past
+       the window edge and raise a scrollbar.
+    */
+    fitBoardToWindow: function() {
+        var barHeight = $("#top-bar").outerHeight();
+        var boardHeight = Math.max($(window).height() - barHeight, World.MIN_BOARD_HEIGHT);
+
+        // the stone sidebar is stretched to the board so the two always end on
+        // the same line, however tall the window is
+        var sidebar = $("#right-column");
+        sidebar.css("top", barHeight);
+        sidebar.outerHeight(boardHeight);
+
+        this.stage.canvas.height = boardHeight;
+        this.stage.canvas.width = $(window).width() - sidebar.outerWidth();
     },
     
     addSpace: function(space) {
@@ -242,6 +271,8 @@ function Space(options) {
 }
 Space.WIDTH = 70;
 Space.HEIGHT = 70;
+// horizontal distance between two hex columns, in whole pixels
+Space.COLUMN_WIDTH = Math.ceil(Space.WIDTH * 3/4);
 Space.passthroughFunc = function(e) {
     if(!e.target.owner) { e.target = e.target.parent; }
     e.target = world.getSpaceByCoords(e.target.owner).shape;
@@ -260,7 +291,7 @@ Space.prototype = {
 
         this.baseShape.owner = this;
         this.shape.owner = this;
-        this.shape.x = this.x * Math.ceil(this.width * 3/4);
+        this.shape.x = this.x * Space.COLUMN_WIDTH;
         this.shape.y = this.y * (this.height) + (this.x%2?0:this.height/2);
 
         this.shape.addEventListener("mousedown", function(e) { 
@@ -293,11 +324,12 @@ Space.prototype = {
         if(terrain.overlayImgObj) {
             var overlay = new createjs.Bitmap(terrain.overlayImgObj);
         if(overlay.image.width == 72) {
-                overlay.x = this.x * Math.ceil(this.width * 3/4);
+                overlay.x = this.x * Space.COLUMN_WIDTH;
                 overlay.y = this.y * (this.height) + (this.x%2?0:this.height/2);
         } else {
-                overlay.x = this.x * Math.ceil(this.width * 3/4) - overlay.image.width / 4;
-                overlay.y = this.y * (this.height) + (this.x%2?0:this.height/2) - overlay.image.height/4;
+                // odd-sized overlays would otherwise land on a half pixel
+                overlay.x = this.x * Space.COLUMN_WIDTH - Math.round(overlay.image.width / 4);
+                overlay.y = this.y * (this.height) + (this.x%2?0:this.height/2) - Math.round(overlay.image.height / 4);
         }
             this.overlayShape = overlay;
             this.overlayShape.owner = this;

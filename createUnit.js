@@ -18,7 +18,7 @@
 */
 var castlePathExists = require("./static/shared/castlePathExists").castlePathExists;
 var Unit = require("./static/shared/unit.js").Unit;
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return require('mongodb').ObjectID.apply(this, arguments); }
+var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
 var loadMap = require("./loadUtils").loadMap;
 var socketOwnerCanAct = require("./auth").socketOwnerCanAct;
 
@@ -30,7 +30,7 @@ module.exports = function(collections, data, socket, socketList) {
         var gameId = ObjectID(data.gameId);
         var user = socket.request.user;
 
-        collections.games.findOne({_id:gameId}, function(err, game) {
+        collections.games.findOne({_id:gameId}).then(function(game) {
             if(!game) { socket.emit("no game"); return; }
             loadMap(game.map, function(err, mapData) {
                 var player = game.players.filter(function(p) { return p.username == user.username })[0];
@@ -52,57 +52,50 @@ function createUnit(data, mapData, collections, game, player, callback) {
     var loadUnitType = require("./loadUtils").loadUnitType;
     var loadFaction = require("./loadUtils").loadFaction;
     
-    loadFaction(player.faction, function(err, faction) {
-        if(faction.recruitList.indexOf(data.type) == -1) { callback({}); }
+    loadFaction(player.faction, async function(err, faction) {
+        if(err || !faction) { callback({}); return; }
+        if(faction.recruitList.indexOf(data.type) == -1) { callback({}); return; }
 
-        collections.units.findOne({ gameId: gameId, x: data.x, y: data.y }, function(err, occupant) {
-            // if the space is populated, abort
-            if(occupant) {
-                callback({});
-                return;
-            }
-            
-            collections.units.find({ gameId: gameId, team: player.team, isCommander: true }, function(err, commanderCursor) {
-                commanderCursor.toArray(function(err, commanders) {
-                    var createValid = false;
-                    
-                    for(var i=0; i < commanders.length; ++i) {
-                        var commander = commanders[i];
-                        
-                        if(mapData[commander.x+","+commander.y].terrain.properties.indexOf("keep") != -1 && // check that the commander is on a keep
-                           mapData[data.x+","+data.y].terrain.properties.indexOf("castle") != -1 && // check target is a castle
-                           castlePathExists(commander, data, mapData) // find a castle-only path from commander to target
-                          ) { createValid = true; }
-                    }
-                    
-                    if(!createValid) { callback({}); return; }
+        var occupant = await collections.units.findOne({ gameId: gameId, x: data.x, y: data.y });
+        // if the space is populated, abort
+        if(occupant) {
+            callback({});
+            return;
+        }
 
-                    data.team = player.team;
-                    
-                    var sanatizedData = {};
-                    sanatizedData.x = data.x;
-                    sanatizedData.y = data.y;
-                    sanatizedData.team = data.team;
-                    sanatizedData.type = data.type;
-                    sanatizedData.gameId = gameId;
+        var commanders = await collections.units.find({ gameId: gameId, team: player.team, isCommander: true }).toArray();
+        var createValid = false;
 
-                    var unit = new Unit(sanatizedData, true);
+        for(var i=0; i < commanders.length; ++i) {
+            var commander = commanders[i];
 
-                    data = unit.getStorableObj();
+            if(mapData[commander.x+","+commander.y].terrain.properties.indexOf("keep") != -1 && // check that the commander is on a keep
+               mapData[data.x+","+data.y].terrain.properties.indexOf("castle") != -1 && // check target is a castle
+               castlePathExists(commander, data, mapData) // find a castle-only path from commander to target
+              ) { createValid = true; }
+        }
 
-                    if(player.gold < unit.cost) { callback({}); return; }
+        if(!createValid) { callback({}); return; }
 
-                    player.gold -= unit.cost;
-                    
-                    collections.games.save(game, { safe: true }, function() {
-                        collections.units.insert(data, function(err) {
-                            if(!err) {
-                                callback(data);
-                            }
-                        });
-                    });
-                });
-            });
-        });
+        data.team = player.team;
+
+        var sanatizedData = {};
+        sanatizedData.x = data.x;
+        sanatizedData.y = data.y;
+        sanatizedData.team = data.team;
+        sanatizedData.type = data.type;
+        sanatizedData.gameId = gameId;
+
+        var unit = new Unit(sanatizedData, true);
+
+        data = unit.getStorableObj();
+
+        if(player.gold < unit.cost) { callback({}); return; }
+
+        player.gold -= unit.cost;
+
+        await collections.games.replaceOne({ _id: game._id }, game);
+        await collections.units.insertOne(data);
+        callback(data);
     });
 };

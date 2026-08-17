@@ -1,0 +1,117 @@
+{
+  "name": "Dwarvish Thunderguard",
+  "img": "/data/img/units/dwarvish_thunderguard.png",
+  "cost": 24,
+  "maxHp": 47,
+  "move": 4,
+  "maxXp": 65,
+  "level": 2,
+  "alignment": "neutral",
+  "attributePool": [
+    "healthy"
+  ],
+  "advancesTo": [
+    "dwarvish_dragonguard"
+  ],
+  "attacks": [
+    {
+      "name": "Dagger",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 6,
+      "number": 3,
+      "icon": "/data/img/attacks/dagger-human.png",
+      "animation": [
+        1,
+        10
+      ]
+    },
+    {
+      "name": "Thunderstick",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 28,
+      "number": 1,
+      "icon": "/data/img/attacks/thunderstick.png",
+      "animation": [
+        11,
+        52
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": 0.2,
+    "impact": 0.2,
+    "fire": 0.1,
+    "cold": 0.1,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/dwarvish_thunderguard-sprite.png"
+}

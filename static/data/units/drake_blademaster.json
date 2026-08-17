@@ -1,0 +1,107 @@
+{
+  "name": "Drake Blademaster",
+  "img": "/data/img/units/drake_blademaster.png",
+  "cost": 62,
+  "maxHp": 80,
+  "move": 6,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "lawful",
+  "attacks": [
+    {
+      "name": "War talon",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 16,
+      "number": 3,
+      "icon": "/data/img/attacks/scimitar.png",
+      "animation": [
+        1,
+        6
+      ]
+    },
+    {
+      "name": "Fire breath",
+      "type": "ranged",
+      "damageType": "fire",
+      "damage": 8,
+      "number": 3,
+      "icon": "/data/img/attacks/fire-breath-drake.png"
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 1,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": -0.1,
+    "impact": 0.2,
+    "fire": 0.5,
+    "cold": -0.5,
+    "arcane": -0.2
+  },
+  "sprite": "/data/img/units/drake_blademaster-sprite.png"
+}

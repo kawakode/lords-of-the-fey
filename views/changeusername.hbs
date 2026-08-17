@@ -19,18 +19,32 @@
 -->
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Change Username</title>
-  <link rel="stylesheet" type="text/css" href="/css/login.css" />
+  <link rel="stylesheet" type="text/css" href="/css/theme.css" />
   <link rel="stylesheet" type="text/css" href="/css/mainmenu.css" />
+  <link rel="stylesheet" type="text/css" href="/css/login.css" />
 </head>
-<body style="margin:0; padding:0;">
+<body class="fey-page">
 {{> menuheader}}
-<div class="main-content" style="padding: 5px; text-align: center;">
-<div>Current username: <strong>{{username}}</strong></div>
+<div class="main-content fey-shell">
+
+<h1 class="fey-title">Take a New Name</h1>
+<div class="fey-rule"><span></span></div>
+
+<div class="fey-panel fey-panel-parchment fey-auth">
+<div class="fey-panel-heading">Herald's writ</div>
+<div style="margin-bottom: 14px;">Current name: <strong>{{username}}</strong></div>
 <form action="/changeusername" method="post">
-<label for="username">New Username</label><input name="newname" id="newname" autofocus="true"><br>
-<input type="submit" value="Change Name">
+<div class="fey-field">
+  <label for="newname">New username</label><input name="newname" id="newname" autofocus="true">
+</div>
+<div class="fey-form-actions">
+  <input type="submit" class="fey-button-primary" value="Change name">
+</div>
 </form>
+</div>
 
 </div>
 </body>

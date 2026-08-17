@@ -1,0 +1,111 @@
+{
+  "name": "Thief",
+  "img": "/data/img/units/thief.png",
+  "cost": 13,
+  "maxHp": 24,
+  "move": 6,
+  "maxXp": 29,
+  "level": 1,
+  "alignment": "chaotic",
+  "advancesTo": [
+    "rogue"
+  ],
+  "attacks": [
+    {
+      "name": "Dagger",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 4,
+      "number": 3,
+      "icon": "/data/img/attacks/dagger-human.png",
+      "properties": [
+        "backstab"
+      ],
+      "animation": [
+        1,
+        3
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": -0.3,
+    "pierce": -0.2,
+    "impact": -0.2,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/thief-sprite.png",
+  "animations": {
+    "die": [
+      4,
+      10
+    ]
+  }
+}

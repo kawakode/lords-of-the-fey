@@ -1,0 +1,109 @@
+{
+  "name": "Ghast",
+  "img": "/data/img/units/ghast.png",
+  "cost": 50,
+  "maxHp": 65,
+  "move": 5,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "undead"
+  ],
+  "attributeCount": 1,
+  "omittedAttributes": [
+    "intelligent"
+  ],
+  "attacks": [
+    {
+      "name": "Bite",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 12,
+      "number": 3,
+      "icon": "/data/img/attacks/fangs.png",
+      "properties": [
+        "poison"
+      ],
+      "animation": [
+        1,
+        6
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": 0.1,
+    "impact": 0.2,
+    "fire": 0.1,
+    "cold": 0.4,
+    "arcane": 0.3
+  },
+  "sprite": "/data/img/units/ghast-sprite.png"
+}

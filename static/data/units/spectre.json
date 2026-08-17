@@ -1,0 +1,119 @@
+{
+  "name": "Spectre",
+  "img": "/data/img/units/spectre.png",
+  "cost": 78,
+  "maxHp": 33,
+  "move": 7,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "undead"
+  ],
+  "attributeCount": 1,
+  "omittedAttributes": [
+    "intelligent"
+  ],
+  "attacks": [
+    {
+      "name": "Baneblade",
+      "type": "melee",
+      "damageType": "arcane",
+      "damage": 9,
+      "number": 4,
+      "properties": [
+        "drains"
+      ],
+      "animation": [
+        1,
+        12
+      ]
+    },
+    {
+      "name": "Wail",
+      "type": "ranged",
+      "damageType": "cold",
+      "damage": 6,
+      "number": 3,
+      "animation": [
+        13,
+        14
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "cave": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.0
+    },
+    "deep_water": {
+      "move": 2,
+      "cover": 0.0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "frozen": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "fungus": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.0
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "unwalkable": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.0
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.5,
+    "pierce": 0.5,
+    "impact": 0.5,
+    "fire": 0.1,
+    "cold": 0.7,
+    "arcane": -0.1
+  },
+  "sprite": "/data/img/units/spectre-sprite.png"
+}

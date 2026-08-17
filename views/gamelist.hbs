@@ -19,25 +19,35 @@
 -->
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Game list</title>
-<link rel="stylesheet" type="text/css" href="/css/gamelist.css" />
+<link rel="stylesheet" type="text/css" href="/css/theme.css" />
 <link rel="stylesheet" type="text/css" href="/css/mainmenu.css" />
+<link rel="stylesheet" type="text/css" href="/css/gamelist.css" />
 </head>
-<body style="padding:0; margin:0;">
+<body class="fey-page">
 {{> menuheader}}
+<div class="fey-shell">
+
 <div id="gamelist-header">
-<h1 style="margin-bottom: 3px;">Your games</h1>
-<a href="/">&lt;&lt; Back to main menu</a><br/><br/>
+<h1 class="fey-title">Your Campaigns</h1>
+<div class="fey-rule"><span></span></div>
+<div><a href="/" class="fey-button">&#9664; Main menu</a> <a href="/lobby" class="fey-button">Lobby</a></div>
 </div>
+
+<div style="margin-top: 22px;">
 {{#each games}}
-  <div class="game-row{{#if isYourTurn}} active-turn{{/if}}"><a href="/client/#game={{_id}}">
-    {{map}}
-    [Players:{{#each players}} <span class="username">{{username}}</span>{{/each}}]
-    
+  <div class="game-row{{#if isYourTurn}} active-turn{{/if}}{{#if isFinished}} finished-game{{/if}}"><a href="/client/#game={{_id}}">
+    <span class="fey-map-name">{{map}}</span>
+    &#9670; {{#each players}}<span class="username">{{username}}</span>{{/each}}
+    {{#if isFinished}}<span class="game-result">{{#if youWon}}&#9733; Victory{{else}}Defeat{{/if}}</span>{{/if}}
   </a></div>
 {{else}}
-<div id="nogames">You don't have any games. Maybe head down to <a href="/lobby">the lobby</a> and start one?</div>
+<div id="nogames">No wars to your name yet. Head down to <a href="/lobby">the lobby</a> and start one.</div>
 {{/each}}
+</div>
 
+</div>
 </body>
 </html>

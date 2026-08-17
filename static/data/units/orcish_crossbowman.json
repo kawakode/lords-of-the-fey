@@ -6,56 +6,119 @@
   "move": 5,
   "maxXp": 80,
   "level": 2,
-  "alignment":"chaotic",
-  "advancesTo": ["orcish_slurbow"],
+  "alignment": "chaotic",
+  "advancesTo": [
+    "orcish_slurbow"
+  ],
   "terrain": {
-    "castle":        { "move": 1, "cover":0.6 },
-    "cave":          { "move": 2, "cover":0.4 },
-    "reef":          { "move": 2, "cover":0.3 },
-    "deep_water":    { "move":-1, "cover":0.0 },
-    "flat":          { "move": 1, "cover":0.4 },
-    "forest":        { "move": 2, "cover":0.5 },
-    "frozen":        { "move": 2, "cover":0.2 },
-    "hills":         { "move": 1, "cover":0.5 },
-    "mountains":     { "move": 2, "cover":0.6 },
-    "fungus":        { "move": 3, "cover":0.4 },
-    "sand":          { "move": 2, "cover":0.3 },
-    "shallow_water": { "move": 3, "cover":0.2 },
-    "swamp":         { "move": 3, "cover":0.4 },
-    "unwalkable":    { "move":-1, "cover":0.0 },
-    "village":       { "move": 1, "cover":0.6 },
-    "impassable":    { "move":-1, "cover":0.0 }
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0.0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0.0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0.0
+    }
   },
   "attributeCount": 2,
-  "attacks":[
+  "attacks": [
     {
-      "name":"Short Sword",
-      "type":"melee",
-      "damageType":"blade",
-      "damage":4,
-      "number":3
+      "name": "Short Sword",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 4,
+      "number": 3,
+      "animation": [
+        1,
+        6
+      ]
     },
     {
-      "name":"Crossbow",
-      "type":"ranged",
-      "damageType":"pierce",
-      "damage":8,
-      "number":3
+      "name": "Crossbow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 8,
+      "number": 3,
+      "animation": [
+        7,
+        9
+      ]
     },
     {
-      "name":"Crossbow",
-      "type":"ranged",
-      "damageType":"fire",
-      "damage":10,
-      "number":2
+      "name": "Crossbow",
+      "type": "ranged",
+      "damageType": "fire",
+      "damage": 10,
+      "number": 2,
+      "animation": [
+        10,
+        12
+      ]
     }
   ],
   "resistances": {
     "arcane": 0.0,
-    "blade":  0.0,
-    "cold":   0.0,
-    "fire":   0.0,
+    "blade": 0.0,
+    "cold": 0.0,
+    "fire": 0.0,
     "impact": 0.0,
     "pierce": 0.0
-  }
+  },
+  "sprite": "/data/img/units/orcish_crossbowman-sprite.png"
 }

@@ -1,15 +1,15 @@
 {
     "name": "Elves",
     "recruitList": [
-        "elvish_scout",
+        "elvish_fighter",
         "elvish_archer",
         "elvish_shaman",
-        "elvish_fighter",
+        "elvish_scout",
+        "mage",
         "merman_hunter",
-        "wose",
-        "mage"
+        "wose"
     ],
     "commanderList": [
-       "elvish_ranger"
+        "elvish_ranger"
     ]
 }

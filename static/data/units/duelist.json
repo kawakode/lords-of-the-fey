@@ -1,0 +1,123 @@
+{
+  "name": "Duelist",
+  "img": "/data/img/units/duelist.png",
+  "cost": 29,
+  "maxHp": 44,
+  "move": 7,
+  "maxXp": 80,
+  "level": 2,
+  "alignment": "lawful",
+  "fixedAttributes": [
+    "skirmisher"
+  ],
+  "advancesTo": [
+    "master_at_arms"
+  ],
+  "attacks": [
+    {
+      "name": "Saber",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 5,
+      "number": 5,
+      "icon": "/data/img/attacks/saber-human.png",
+      "animation": [
+        1,
+        3
+      ]
+    },
+    {
+      "name": "Crossbow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 12,
+      "number": 1,
+      "icon": "/data/img/attacks/crossbow-human.png",
+      "animation": [
+        4,
+        4
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.7
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": -0.3,
+    "pierce": -0.2,
+    "impact": -0.2,
+    "fire": 0.0,
+    "cold": 0.1,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/duelist-sprite.png",
+  "animations": {
+    "die": [
+      5,
+      12
+    ]
+  }
+}

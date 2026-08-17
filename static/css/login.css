@@ -16,26 +16,126 @@
     You should have received a copy of the GNU Affero General Public License
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
-label {
-    display: inline-block;
-    width: 200px;
-    padding-right: 5px;
-    text-align: right;
-}​
 
-/* */
-a { }
+/* Log in / sign up / change name: a parchment writ nailed to a wooden board. */
+
+.fey-auth {
+    max-width: 430px;
+    margin: 34px auto 24px auto;
+}
+
+.fey-auth form {
+    margin: 0;
+}
+
+.fey-auth label {
+    display: block;
+    width: auto;
+    padding: 0;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.fey-auth input[type="text"],
+.fey-auth input[type="password"],
+.fey-auth input:not([type]) {
+    display: block;
+    width: 100%;
+    margin: 5px 0 0 0;
+    box-sizing: border-box;
+}
+
+.fey-auth .fey-form-actions input[type="submit"] {
+    width: 100%;
+}
+
+/* wax-seal style rivets in the corners of the writ */
+.fey-auth.fey-panel-parchment::before,
+.fey-auth.fey-panel-parchment::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 9px;
+    height: 10px;
+    background: var(--stone);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.fey-auth.fey-panel-parchment::before { left: 12px; }
+.fey-auth.fey-panel-parchment::after  { right: 12px; }
+
+.fey-auth-switch {
+    margin: 4px auto 0 auto;
+    max-width: 430px;
+    font-size: 14px;
+    text-align: center;
+    color: var(--parchment-shade);
+}
+
+/* --------------------------- oauth providers --------------------------- */
 
 #authlist {
     clear: both;
-    width: 400px;
-    margin: 10px auto 0 auto;
-    text-align: canter;
+    max-width: 430px;
+    margin: 24px auto 0 auto;
+    text-align: center;
+}
+
+#authlist::before {
+    content: "or swear fealty through";
+    display: block;
+    margin-bottom: 12px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+}
+
+/* no providers configured: drop the label (browsers without :has keep it) */
+#authlist:not(:has(.authbox))::before {
+    content: none;
+}
+
+#authlist hr {
+    display: none;
 }
 
 .authbox {
     display: inline-block;
-    font-size: 8pt;
+    margin: 6px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    vertical-align: top;
 }
 
+.authbox a {
+    display: block;
+    padding: 10px 10px 8px 10px;
+    color: var(--parchment);
+    text-decoration: none;
+    background-image: linear-gradient(180deg, var(--wood) 0%, var(--wood-dark) 100%);
+    border: 2px solid var(--wood-darkest);
+    border-top-color: var(--wood-light);
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 3px 10px rgba(0, 0, 0, 0.5);
+}
 
+.authbox a:hover {
+    color: #fff4d2;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16),
+                0 0 14px rgba(195, 155, 40, 0.4);
+}
+
+.authbox img {
+    display: block;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 7px auto;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+}

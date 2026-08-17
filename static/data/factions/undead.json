@@ -1,0 +1,15 @@
+{
+    "name": "Undead",
+    "recruitList": [
+        "skeleton",
+        "skeleton_archer",
+        "ghoul",
+        "vampire_bat",
+        "walking_corpse",
+        "dark_adept",
+        "ghost"
+    ],
+    "commanderList": [
+        "dark_sorcerer"
+    ]
+}

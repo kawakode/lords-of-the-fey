@@ -1,0 +1,17 @@
+{
+    "name": "Knalgan Alliance",
+    "recruitList": [
+        "dwarvish_fighter",
+        "dwarvish_guardsman",
+        "dwarvish_thunderer",
+        "dwarvish_ulfserker",
+        "dwarvish_scout",
+        "footpad",
+        "poacher",
+        "thief",
+        "gryphon_rider"
+    ],
+    "commanderList": [
+        "dwarvish_steelclad"
+    ]
+}

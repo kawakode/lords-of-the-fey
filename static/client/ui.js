@@ -17,6 +17,21 @@
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
 var ui = {
+    // status colours picked to read against the dark stone panels
+    GOOD_COLOR: "#7fd06a",
+    WARN_COLOR: "#f0ed00",
+    BAD_COLOR:  "#e06055",
+
+    /** what each phase of the day does to damage, per Unit.getDaytimeMultiplier */
+    DAYTIME_EFFECTS: {
+        "dawn":         "Neither side favoured.",
+        "morning":      "Lawful units +25% damage, chaotic -25%.",
+        "afternoon":    "Lawful units +25% damage, chaotic -25%.",
+        "dusk":         "Neither side favoured.",
+        "first watch":  "Chaotic units +25% damage, lawful -25%.",
+        "second watch": "Chaotic units +25% damage, lawful -25%."
+    },
+
     moveHappening: false,
     moveAnimating: false,
     hasTurn: false,
@@ -51,13 +66,16 @@ var ui = {
             ui.path = aStar(world, world.getUnitAt(ui.pathSource), ui.pathSource, ui.pathTarget, ui.path, gameInfo);
             world.mapContainer.removeChild(ui.pathShape);
 
-            if(ui.path) {
-                var attackTarget = world.getUnitAt(ui.path[ui.path.length-1].space);
-            }
+            if(!ui.path) { ui.pathShape = null; world.stage.update(); return; }
+
+            var attackTarget = world.getUnitAt(ui.path[ui.path.length-1].space);
 
             ui.pathShape = new createjs.Container();
             for(var i=0;i<ui.path.length;++i){
                 var s = ui.path[i].space;
+                var turn = ui.path[i].turn || 0;
+                // spaces the unit only reaches on a later turn are drawn faded
+                var pipColor = turn > 0 ? "rgba(90,90,150,0.45)" : "rgba(128,128,200,0.7)";
                 var pip = new createjs.Container();
                 pip.x = s.shape.x;
                 pip.y = s.shape.y;
@@ -65,10 +83,25 @@ var ui = {
                 pip.addEventListener("click", Space.passthroughFunc);
                 pip.addEventListener("rollover", Space.passthroughFunc);
                 var bar = new createjs.Shape();
-                ui.drawHexWithGraphic(bar.graphics.beginFill("rgba(128,128,200,0.7)"));
+                ui.drawHexWithGraphic(bar.graphics.beginFill(pipColor));
                 bar.regX = 0;
                 bar.regY = 0;
                 pip.addChild(bar);
+
+                // mark where each turn of the plan ends, the way Wesnoth numbers
+                // multi-turn moves ("1" is where this turn's movement stops)
+                var nextTurn = (ui.path[i+1] || {}).turn;
+                if(nextTurn === undefined || nextTurn > turn) {
+                    var isFinalSpace = (i == ui.path.length-1);
+                    if(turn > 0 || !isFinalSpace) {
+                        var turnText = new createjs.Text(String(turn + 1));
+                        turnText.font = "bold 16pt sans serif";
+                        turnText.color = "#FFF";
+                        turnText.x = 30;
+                        turnText.y = 4;
+                        pip.addChild(turnText);
+                    }
+                }
 
                 // draw the cover for the final space: the real final space if not an attack, otherwise the second-to-last
                 if(i == ui.path.length-(attackTarget?2:1)) {
@@ -130,7 +163,7 @@ var ui = {
 
             $("#right_data_hp").text(ui.hoverUnit.hp + "/" + ui.hoverUnit.maxHp);
             var hpRatio = ui.hoverUnit.hp / ui.hoverUnit.maxHp;
-            var hpColor = ["#A00", "#f0ed00"][Math.floor(hpRatio * 3)] || "green";
+            var hpColor = [ui.BAD_COLOR, ui.WARN_COLOR][Math.floor(hpRatio * 3)] || ui.GOOD_COLOR;
             $("#right_data_hp").css("color", hpColor);
 
             $("#right_data_resistances").empty().append($("<table>").append(
@@ -285,16 +318,23 @@ var ui = {
         world.stage.update();
     },
 
+    // wood-and-gold plaque drawn on the canvas for the right-click menu
+    contextMenuStyle: {
+        width: 118,
+        itemHeight: 40,
+        pad: 6,
+        backing: "#241708",
+        frame: "#8a6c1b",
+        item: "#4a3320",
+        itemEdge: "#1b1008",
+        text: "#f0d477",
+        font: "bold 15px 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif"
+    },
+
     onContextMenu: function(space, coords) {
         if(ui.showingMenu) { ui.hideMenus(); return; }
 
-        var cm = ui.contextMenu = new createjs.Container();
-        cm.x = coords.x;
-        cm.y = coords.y;
-
-        var cmBacking = new createjs.Shape();
-        cmBacking.graphics.beginFill("rgb(0,0,170)").drawRect(0, 0, 100, 205);
-        cm.addChild(cmBacking);
+        var style = ui.contextMenuStyle;
 
         for(pos in world.units) {
             var unit = world.units[pos];
@@ -305,30 +345,58 @@ var ui = {
             }
         }
 
-        function createMenuItem(row, text, callback) {
-            var item = new createjs.Shape();
-            item.graphics.beginFill("#99F").drawRect(5, row * 50 + 5, 90, 45);
-            cm.addChild(item);
-
-            var itemText = new createjs.Text(text);
-            itemText.x = 10;
-            itemText.y = row * 50 + 10;
-            cm.addChild(itemText);
-
-            item.addEventListener("click", callback);
-            item.addEventListener("click", ui.hideMenus);
-        }
+        // gather the entries first, so the plaque is drawn to fit them instead
+        // of leaving empty slots below the last one
+        var entries = [];
 
         if(foundPath) {
-            createMenuItem(0, "Recruit", function() {
+            entries.push({ text: "Recruit", callback: function() {
                 ui.showRecruitPrompt(function(typeName) {
                     if(typeName) {
                         socket.emit("create", { gameId: gameInfo.gameId, type: typeName, x: space.x, y: space.y, anonToken: gameInfo.anonToken });
                             ui.moveHappening = true;
                     }
                 });
-            });
+            }});
         }
+
+        if(!entries.length) { return; }
+
+        var cm = ui.contextMenu = new createjs.Container();
+        cm.x = coords.x;
+        cm.y = coords.y;
+
+        var menuHeight = entries.length * style.itemHeight + style.pad * 2;
+
+        var cmBacking = new createjs.Shape();
+        cmBacking.graphics.beginFill(style.backing)
+                          .setStrokeStyle(2).beginStroke(style.frame)
+                          .drawRoundRect(1, 1, style.width - 2, menuHeight - 2, 3);
+        cm.addChild(cmBacking);
+
+        entries.forEach(function(entry, row) {
+            var top = style.pad + row * style.itemHeight;
+            var itemHeight = style.itemHeight - 4;
+
+            var item = new createjs.Shape();
+            item.graphics.beginFill(style.item)
+                         .setStrokeStyle(1).beginStroke(style.itemEdge)
+                         .drawRoundRect(style.pad, top, style.width - style.pad * 2, itemHeight, 2);
+            cm.addChild(item);
+
+            var itemText = new createjs.Text(entry.text, style.font, style.text);
+            itemText.textAlign = "center";
+            itemText.textBaseline = "middle";
+            itemText.x = style.width / 2;
+            itemText.y = top + itemHeight / 2;
+            // let clicks fall through to the plaque underneath, so hitting a
+            // letter counts as hitting the item
+            itemText.mouseEnabled = false;
+            cm.addChild(itemText);
+
+            item.addEventListener("click", entry.callback);
+            item.addEventListener("click", ui.hideMenus);
+        });
 
         world.stage.addChild(cm);
         world.stage.update();
@@ -341,7 +409,7 @@ var ui = {
         if(!ui.modalWall) { return; }
 
         ui.modalWall.graphics = new createjs.Graphics();
-        ui.modalWall.graphics.beginFill("rgba(128,128,128,0.5)").drawRect(0, 0, canvas.width, canvas.height);
+        ui.modalWall.graphics.beginFill("rgba(12,8,3,0.62)").drawRect(0, 0, canvas.width, canvas.height);
     },
 
     showRecruitPrompt: function(resolutionCallback) {
@@ -365,8 +433,8 @@ var ui = {
         recruitPromptDOM.show();
 
         ui.recruitPrompt = new createjs.DOMElement(recruitPromptDOM.get(0));
-        ui.recruitPrompt.x = (canvas.width - promptWidth) / 2;
-        ui.recruitPrompt.y = -canvas.height + ((canvas.height - promptHeight) / 2);
+        ui.recruitPrompt.x = Math.round((canvas.width - promptWidth) / 2);
+        ui.recruitPrompt.y = Math.round(-canvas.height + ((canvas.height - promptHeight) / 2));
 
         recruitListDOM.html("");
 
@@ -507,8 +575,9 @@ var ui = {
                     unit.bodyShape.scaleX = 1;
                 }
 
-                unit.shape.x = prevX + stepProgress * diffX;
-                unit.shape.y = prevY + stepProgress * diffY;
+                // keep the sprite on whole pixels so it does not blur mid-step
+                unit.shape.x = Math.round(prevX + stepProgress * diffX);
+                unit.shape.y = Math.round(prevY + stepProgress * diffY);
 
                 world.stage.update();
             } else if(nextSpace && nextSpace.x) {
@@ -567,6 +636,25 @@ var ui = {
         });
     },
 
+    /**
+       Play a unit's death animation, if its sprite sheet has one, and take it off
+       the board once the animation is done. Units without a death animation are
+       removed immediately.
+    */
+    animateUnitDeath: function(unit) {
+        var deathFrames = (unit.animations || {}).die;
+        if(!deathFrames) { world.removeUnit(unit); return; }
+
+        var frameCount = deathFrames[1] - deathFrames[0] + 1;
+        // play all frames in half a second, multiplied by animationFactor speedup
+        unit.bodyShape.framerate = frameCount * 2 * ui.animationFactor;
+        unit.bodyShape.gotoAndPlay("die");
+
+        setTimeout(function() {
+            world.removeUnit(unit);
+        }, 500 * ui.animationFactor);
+    },
+
     animateAttack: function(moveData) {
         ui.moveAnimating = true;
 
@@ -621,41 +709,43 @@ var ui = {
                 }
 
                 if(attack.type == "melee") {
-                    actor.shape.x += (retreat ? 1 : -1) * (entry.offense ? 1 : -1) * dX;
-                    actor.shape.y += (retreat ? 1 : -1) * (entry.offense ? 1 : -1) * dY;
+                    // round the resulting position (not the step) so that the lunge
+                    // and the matching retreat land back on the same whole pixel
+                    var lunge = (retreat ? 1 : -1) * (entry.offense ? 1 : -1);
+                    actor.shape.x = Math.round(actor.shape.x + lunge * dX);
+                    actor.shape.y = Math.round(actor.shape.y + lunge * dY);
                     world.stage.update();
                 } else if(attack.type == "ranged" && !retreat) {
                     var projectile = new createjs.Shape();
+
+                    var projectileStartX = Math.round(actor.shape.x + Space.WIDTH / 2);
+                    var projectileStartY = Math.round(actor.shape.y + Space.HEIGHT / 2);
 
                     if(attack.img) {
                         var path = (direction=="n" || direction=="s") ? attack.img["n"] : attack.img["ne"];
                         projectile = new createjs.Bitmap(path);
                         var rotationTable = { s: 180, n: 0, ne: 0, nw: -90, se: 90, sw: 180 };
                         projectile.rotation = rotationTable[direction];
-                        projectile.x = actor.shape.x + Space.WIDTH/2;
-                        projectile.y = actor.shape.y + Space.HEIGHT/2;
-                        projectile.regX = Space.WIDTH/2;
-                        projectile.regY = Space.HEIGHT/2;
+                        projectile.x = projectileStartX;
+                        projectile.y = projectileStartY;
+                        projectile.regX = Math.round(Space.WIDTH / 2);
+                        projectile.regY = Math.round(Space.HEIGHT / 2);
                     } else {
                         projectile.graphics.beginFill("black").drawRect(0,0,7,7);
-                        projectile.x = actor.shape.x + Space.WIDTH / 2;;
-                        projectile.y = actor.shape.y + Space.HEIGHT / 2;;
+                        projectile.x = projectileStartX;
+                        projectile.y = projectileStartY;
                     }
 
-                    if(!retreat && actor.bodyShape.spriteSheet.animations.indexOf("") > -1) {
-                        var attackFrames = actor.animations.attack;
-                        var frameCount = attackFrames[1] - attackFrames[0] + 1;
-                        // get in all frames in half a second, multiplied by animationFactor speedup
-                        actor.bodyShape.framerate  = frameCount * 2 * ui.animationFactor;
-                        actor.bodyShape.gotoAndPlay("ranged");
-                    }
-
-                    for(var j=0; j<15; j++) {
-                        setTimeout(function() {
-                            projectile.x += (entry.offense ? -1 : 1) * dX;
-                            projectile.y += (entry.offense ? -1 : 1) * dY;
+                    // position each frame from the launch point rather than by
+                    // accumulating fractional steps, so the sprite stays sharp and
+                    // still lands exactly on the target hex
+                    var flightDirection = (entry.offense ? -1 : 1);
+                    for(var j=1; j<=15; j++) {
+                        setTimeout(function(step) {
+                            projectile.x = Math.round(projectileStartX + flightDirection * dX * step);
+                            projectile.y = Math.round(projectileStartY + flightDirection * dY * step);
                             world.stage.update();
-                        }, (500/15*j) * ui.animationFactor);
+                        }.bind(null, j), (500/15*j) * ui.animationFactor);
                     }
                     setTimeout(function() {
                         world.mapContainer.removeChild(projectile);
@@ -678,7 +768,7 @@ var ui = {
                     }
                     
                     if(entry.kill) {
-                        world.removeUnit(hittee);
+                        ui.animateUnitDeath(hittee);
                     }
 
                     if(entry.poisoned) {
@@ -726,8 +816,8 @@ var ui = {
         ui.modal.addChild(ui.modalWall);
         world.stage.addChild(ui.modal);
 
-        var promptWidth = 600;
-        var promptHeight = 68 * attacker.attacks.length + 110;
+        var promptWidth = 640;
+        var promptHeight = 86 * attacker.attacks.length + 190;
 
         var attackPromptDOM = $("#attack-prompt");
         var attackListDOM = $("#attack-list");
@@ -737,56 +827,114 @@ var ui = {
         attackPromptDOM.show();
 
         ui.attackPrompt = new createjs.DOMElement(attackPromptDOM.get(0));
-        ui.attackPrompt.x = (canvas.width - promptWidth) / 2;
-        ui.attackPrompt.y = -canvas.height + ((canvas.height - promptHeight) / 2);
+        ui.attackPrompt.x = Math.round((canvas.width - promptWidth) / 2);
+        ui.attackPrompt.y = Math.round(-canvas.height + ((canvas.height - promptHeight) / 2));
 
         attackListDOM.html("");
 
-        var makeAttackStatsElem = function(attack, hitChance) {
-            if(!attack) { return $("<td>").text("-- none --"); }
-            var hitPercent = Math.round(hitChance*100);
-            return $("<td>").append([
-                $("<span>").text(attack.name).css("font-weight", "bold"),
-                $("<br>"),
-                $("<span>").text(attack.damage + "-" + attack.number + " " + (attack.properties?attack.properties.join(", "):"")),
-                $("<br>"),
-                $("<span>").text(hitPercent+"%").css("color", {
-                    "10": "#F00", "20": "#F00", "30": "#F00",
-                    "40": "#FF0", "50": "#FF0",
-                    "60": "#ADFF2F",
-                    "70": "#0F0", "80": "#0F0", "90": "#0F0"
-                }[hitPercent])
-            ]);
+        // the attacker resolves combat from the last space of the path before the
+        // target hex, so cover and leadership must be judged from there
+        var attackSpace = ui.path[ui.path.length-2].space;
+        var defenderSpace = ui.path[ui.path.length-1].space;
+
+        var titleCase = function(text) {
+            return String(text).replace(/_/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); });
         };
 
-        var makeCombatantElem = function(combatant, floatDir) {
+        var hitChanceColor = function(hitPercent) {
+            if(hitPercent < 40) { return "#ff6a5a"; }
+            if(hitPercent < 60) { return "#ffe14d"; }
+            if(hitPercent < 70) { return "#b6e84f"; }
+            return "#6be26b";
+        };
+
+        var makeAttackStatsElem = function(attack, cover) {
+            if(!attack) { return $("<td>").addClass("attack-stats no-attack").text("-- no counterattack --"); }
+
+            var hitPercent = Math.round((1 - cover) * 100);
+            var properties = (attack.properties || []).join(", ");
+
+            var lines = [
+                $("<span>").addClass("attack-name").text(attack.name),
+                $("<br>"),
+                $("<span>").text(attack.damage + "-" + attack.number + " " + titleCase(attack.damageType)),
+                $("<br>"),
+                $("<span>").addClass("attack-odds")
+                           .text(hitPercent + "% to hit")
+                           .css("color", hitChanceColor(hitPercent)),
+                $("<span>").addClass("attack-detail").text(" (" + Math.round(cover*100) + "% cover)"),
+                $("<span>").addClass("attack-detail").text(" • up to " + (attack.damage * attack.number) + " dmg")
+            ];
+
+            if(properties) {
+                lines.push($("<br>"), $("<span>").addClass("attack-properties").text(properties));
+            }
+
+            return $("<td>").addClass("attack-stats").append(lines);
+        };
+
+        var makeCombatantElem = function(combatant, space, floatDir) {
+            var hpRatio = combatant.hp / combatant.maxHp;
+            var hpColor = [ui.BAD_COLOR, ui.WARN_COLOR][Math.floor(hpRatio * 3)] || ui.GOOD_COLOR;
+
+            var daytimeMultiplier = combatant.getDaytimeMultiplier(gameInfo.timeOfDay);
+            var alignment = titleCase(combatant.alignment || "neutral");
+            if(daytimeMultiplier != 1) {
+                alignment += (daytimeMultiplier > 1 ? " +" : " ") + Math.round((daytimeMultiplier-1)*100) + "%";
+            }
+
+            var terrainCover = Math.round(combatant.getCoverOnSpace(space) * 100);
+
             return [
-                $($("<div>", { class: "img-wrapper" }).append(combatant.imgObj)).css("float",floatDir),
-                $("<div>").append([
-                    $("<span>").text(combatant.name),
+                $($("<div>", { class: "img-wrapper" }).append(combatant.imgObj)).css("float", floatDir),
+                $("<div>").addClass("combatant-stats").append([
+                    $("<span>").addClass("combatant-name").text(combatant.name),
                     $("<br>"),
-                    $("<span>").text(combatant.hp + "/" + combatant.maxHp),
-                ]).css("float",floatDir),
+                    $("<span>").text("Level " + (combatant.level || 1) + " • " + alignment),
+                    $("<br>"),
+                    $("<span>").text("HP " + combatant.hp + "/" + combatant.maxHp).css("color", hpColor),
+                    $("<span>").text("  XP " + combatant.xp + "/" + combatant.maxXp),
+                    $("<br>"),
+                    $("<span>").addClass("attack-detail").text(titleCase(space.terrain.name || space.terrain.properties[0]) + " • " + terrainCover + "% cover")
+                ]).css("float", floatDir)
             ];
         }
 
+        var makeResistanceElem = function(combatant) {
+            var cells = Object.keys(combatant.resistances).map(function(damageType) {
+                var resist = combatant.resistances[damageType];
+                return $("<span>").addClass("resistance")
+                                  .css("color", resist > 0 ? ui.GOOD_COLOR : (resist < 0 ? ui.BAD_COLOR : "inherit"))
+                                  .text(titleCase(damageType) + " " + (resist<0?"":"+") + Math.round(resist*100) + "%");
+            });
+            return $("<div>").addClass("combatant-resistances").append(cells);
+        };
+
         var selectedItem;
 
-        $("#attack-combatants").empty().append(makeCombatantElem(attacker, "left")).append(makeCombatantElem(defender, "right"));
+        $("#attack-combatants").empty()
+            .append(makeCombatantElem(attacker, attackSpace, "left"))
+            .append(makeCombatantElem(defender, defenderSpace, "right"));
+
+        $("#attack-resistances").empty()
+            .append(makeResistanceElem(attacker).css("float", "left"))
+            .append(makeResistanceElem(defender).css("float", "right"));
 
         for(var i=0; i<attacker.attacks.length; ++i) {
             var attack = attacker.attacks[i];
-            attack = defender.applyAttack(attack, attacker, gameInfo.timeOfDay, ui.path[ui.path.length-2].space);
+            attack = defender.applyAttack(attack, attacker, gameInfo.timeOfDay, attackSpace);
             var attackIcon = new Image();
             attackIcon.src = attack.icon;
             $(attackIcon).css("float","left");
 
-            var attackerCover = attacker.getCoverOnSpace(world.getSpaceByCoords(attacker));
-            var defenderCover = defender.getCoverOnSpace(world.getSpaceByCoords(defender), attack, true);
+            // an attack's own properties (magical, marksman) can override terrain cover,
+            // so both covers are recomputed per attack rather than once for the prompt
+            var attackerCover = attacker.getCoverOnSpace(attackSpace);
+            var defenderCover = defender.getCoverOnSpace(defenderSpace, attack, true);
 
             var defense = defender.selectDefense(attacker, attack, gameInfo.timeOfDay, attackerCover, defenderCover).defense;
-            defense = attacker.applyAttack(defense, defender, gameInfo.timeOfDay, ui.path[ui.path.length-1].space);
-            attackerCover = attacker.getCoverOnSpace(world.getSpaceByCoords(attacker), defense, false);
+            defense = attacker.applyAttack(defense, defender, gameInfo.timeOfDay, defenderSpace);
+            attackerCover = attacker.getCoverOnSpace(attackSpace, defense, false);
 
             var defenseIcon;
             if(defense) {
@@ -799,9 +947,9 @@ var ui = {
             var attackButton = $("<tr class='attack-item'>");
 
             attackButton.append($("<td>").append(attackIcon).css("width", 60));
-            attackButton.append(makeAttackStatsElem(attack, 1-defenderCover).css("width", 180));
-            attackButton.append($("<td>").text("--"+attack.type+"--").css({ "text-align":"center" }));
-            attackButton.append(makeAttackStatsElem(defense, 1-attackerCover).css({ "width":180 }));
+            attackButton.append(makeAttackStatsElem(attack, defenderCover).css("width", 200));
+            attackButton.append($("<td>").addClass("attack-type").text(titleCase(attack.type)));
+            attackButton.append(makeAttackStatsElem(defense, attackerCover).css({ "width":200 }));
             attackButton.append($("<td>").append(defenseIcon).css("width", 60));
 
             attackListDOM.append(attackButton);
@@ -849,8 +997,8 @@ var ui = {
         recruitPromptDOM.show();
 
         ui.recruitPrompt = new createjs.DOMElement(recruitPromptDOM.get(0));
-        ui.recruitPrompt.x = (canvas.width - promptWidth) / 2;
-        ui.recruitPrompt.y = -canvas.height + ((canvas.height - promptHeight) / 2);
+        ui.recruitPrompt.x = Math.round((canvas.width - promptWidth) / 2);
+        ui.recruitPrompt.y = Math.round(-canvas.height + ((canvas.height - promptHeight) / 2));
 
         recruitListDOM.html("");
 
@@ -859,7 +1007,7 @@ var ui = {
 
             var listItem = $("<div class='recruit-item'>");
             
-            listItem.append($("<div>", { class: "img-wrapper", style:{float:"left"} }).appendChild(unit.imgObj));
+            listItem.append($("<div>", { class: "img-wrapper" }).css("float", "left").append(unit.imgObj));
 
             var unitText = $("<span>");
             unitText.text(unit.name);
@@ -924,8 +1072,75 @@ var ui = {
 
     updatePlayer: function(data) {
         if(data.gold != undefined) {
+            gameInfo.player.gold = data.gold;
             $("#top-gold-text").text(data.gold);
+            ui.refreshStatTips();
         }
+    },
+
+    /** "first watch" -> "First Watch" */
+    titleCase: function(text) {
+        return String(text).replace(/_/g, " ").replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    },
+
+    /** side colour of the dot on the top bar, indexed by team number */
+    TEAM_COLORS: ["rgba(0,0,0,0)", "#F00", "#00F", "#F0F", "#444"],
+
+    /**
+       Redraw everything that depends on whose turn it is: the team dot, the
+       time of day and the hover tips that describe them.
+    */
+    updateTurnStatus: function() {
+        $("#top-active-team-text").text(gameInfo.activeTeam);
+        $("#top-active-color").css("background-color", ui.TEAM_COLORS[gameInfo.activeTeam]);
+
+        var activePlayer = (gameInfo.players || []).filter(function(p) {
+            return p && p.team == gameInfo.activeTeam;
+        })[0];
+        var isMine = ("team" in gameInfo.player) && gameInfo.activeTeam == gameInfo.player.team;
+
+        $("#top-active-team").attr("data-tip",
+            "Turn: team " + gameInfo.activeTeam + (activePlayer ? " - " + activePlayer.username : "") +
+            "\n" + (isMine ? "Your move: act with your units, then end the turn."
+                           : "Waiting for them to finish moving."));
+
+        var phase = gameInfo.timeOfDay;
+        if(phase) {
+            var label = ui.titleCase(phase);
+            var effect = ui.DAYTIME_EFFECTS[phase] || "";
+            $("#top-turn-count-text").text(label);
+            $("#top-turn-count").attr("data-tip", "Time of day: " + label + "\n" + effect);
+            $("#right_time_of_day").prop("src", "/data/img/schedule/schedule-" + phase + ".png")
+                                   .prop("title", label + " - " + effect);
+        }
+
+        $("#top-username").attr("data-tip", "Playing as " + gameInfo.player.username +
+            (("team" in gameInfo.player) ? "\nYou command team " + gameInfo.player.team + "."
+                                        : "\nYou are watching this game."));
+    },
+
+    /** keep the tips that quote numbers in step with the board */
+    refreshStatTips: function() {
+        var villagePay = ui.ownedVillageCount * 2;
+        var uncovered = Math.max(0, ui.costlyUnitCount - ui.ownedVillageCount);
+
+        $("#top-gold").attr("data-tip", "Gold: " + (gameInfo.player.gold || 0) +
+            "\nSpent recruiting units from a keep.");
+
+        $("#top-village-count").attr("data-tip",
+            "Villages: " + ui.ownedVillageCount + " of " + ui.totalVillageCount + " held" +
+            "\nEach one pays 2 gold a turn and heals the unit standing on it.");
+
+        $("#top-unit-count").attr("data-tip", "Units: " + ui.ownedUnitCount + " on the field" +
+            "\n" + ui.costlyUnitCount + " of them cost gold; commanders and loyal units are free.");
+
+        $("#top-upkeep").attr("data-tip",
+            "Upkeep: " + uncovered + " unit" + (uncovered == 1 ? "" : "s") + " your villages do not cover" +
+            "\n" + ui.costlyUnitCount + " paid units against " + ui.ownedVillageCount + " villages.");
+
+        $("#top-income").attr("data-tip",
+            "Income: " + (2 + villagePay - ui.costlyUnitCount) + " gold at the start of your next turn" +
+            "\n2 base + " + villagePay + " from villages - " + ui.costlyUnitCount + " for paid units.");
     },
 
     finishAnimation: function() {
@@ -970,6 +1185,7 @@ var ui = {
 
     updateUpkeep: function() {
         $("#top-upkeep-text").text(Math.max(0, ui.costlyUnitCount - ui.ownedVillageCount) + " (" + ui.costlyUnitCount + ")");
+        ui.refreshStatTips();
     },
 
     showPlayerStats: function() {
@@ -982,7 +1198,7 @@ var ui = {
         for(var i=0; i<gameInfo.players.length; ++i) {
             if(!gameInfo.players[i]) { continue; }
             $("<tr>").append([
-                $("<td>", {text: gameInfo.players[i].team }).css("color", ["rgba(0,0,0,0)","#F00","#00F","#F0F", "#444"][gameInfo.players[i].team]),
+                $("<td>", {text: gameInfo.players[i].team }).css("color", ui.TEAM_COLORS[gameInfo.players[i].team]),
                 $("<td>", {text: gameInfo.players[i].username }),
                 $("<td>", {text: gameInfo.players[i].alliance }),
                 $("<td>").append(gameInfo.players[i].anonToken?$("<a>", {text: "Link to control this player", title: "Use this link to play as this anonymous player", href: window.location.href.replace(/&?token=([0-9a-f.])*&?/, "")+"&token="+gameInfo.players[i].anonToken }):"")

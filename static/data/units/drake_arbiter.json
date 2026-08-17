@@ -1,0 +1,117 @@
+{
+  "name": "Drake Arbiter",
+  "img": "/data/img/units/drake_arbiter.png",
+  "cost": 32,
+  "maxHp": 63,
+  "move": 5,
+  "maxXp": 81,
+  "level": 2,
+  "alignment": "lawful",
+  "advancesTo": [
+    "drake_warden"
+  ],
+  "attacks": [
+    {
+      "name": "Halberd",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 11,
+      "number": 3,
+      "icon": "/data/img/attacks/halberd.png",
+      "animation": [
+        1,
+        4
+      ]
+    },
+    {
+      "name": "Halberd",
+      "type": "melee",
+      "damageType": "pierce",
+      "damage": 17,
+      "number": 2,
+      "icon": "/data/img/attacks/halberd.png",
+      "properties": [
+        "firststrike"
+      ],
+      "animation": [
+        5,
+        8
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "frozen": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": 0.1,
+    "impact": 0.3,
+    "fire": 0.5,
+    "cold": -0.5,
+    "arcane": -0.2
+  },
+  "sprite": "/data/img/units/drake_arbiter-sprite.png"
+}

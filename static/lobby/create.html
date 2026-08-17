@@ -20,18 +20,29 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lobby</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="../client/jquery-2.0.3.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/play.css" />
+    <link rel="stylesheet" type="text/css" href="/css/theme.css" />
+    <link rel="stylesheet" type="text/css" href="/css/lobby.css" />
   </head>
-  <body>
-    <form type="post" action="creategame">
-      Game name: <input name="name"><br>
-      <input type="submit" id="create-button">
-    </form>
-    <script>
+  <body class="fey-page">
+    <div class="fey-shell">
+      <h1 class="fey-title" style="font-size: 30px; text-align: center;">Raise a Room</h1>
+      <div class="fey-rule"><span></span></div>
 
-    </script>
+      <div class="fey-panel fey-panel-parchment" style="max-width: 420px;">
+        <form type="post" action="creategame">
+          <div class="fey-field">
+            <label for="create-name">Game name</label>
+            <input name="name" id="create-name">
+          </div>
+          <div class="fey-form-actions">
+            <input type="submit" id="create-button" class="fey-button-primary" value="Create">
+          </div>
+        </form>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,0 +1,599 @@
+/**
+    Copyright 2014 Andrew P. Sillers
+
+    This file is part of Lords of the Fey.
+
+    Lords of the Fey is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Lords of the Fey is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* ------------------------------------------------------------------
+   Shared fantasy/medieval skin for the out-of-game screens
+   (main menu, login, signup, game list, lobby, room).
+   Wood, stone, parchment, iron and gold; hex motifs from the map.
+   ------------------------------------------------------------------ */
+
+:root {
+    --wood-darkest: #1b1008;
+    --wood-dark:    #2c1d10;
+    --wood:         #4a3320;
+    --wood-light:   #6d4c2c;
+
+    --stone-dark:   #2f2c26;
+    --stone:        #5b564b;
+    --stone-light:  #938c7c;
+
+    --parchment:       #e7d9b4;
+    --parchment-shade: #d2c096;
+    --parchment-edge:  #a8916a;
+
+    --ink:       #2a1f12;
+    --ink-soft:  #4d3c25;
+
+    --gold:       #c39b28;
+    --gold-light: #f0d477;
+    --gold-dim:   #8a6c1b;
+
+    --moss:  #4f7136;
+    --moss-light: #7fa757;
+    --blood: #8d2020;
+    --blood-light: #d05a4a;
+
+    --font-display: "Trajan Pro", "Cinzel", "Palatino Linotype", "Book Antiqua",
+                    Palatino, "Times New Roman", serif;
+    --font-body: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+
+    --frame-shadow: 0 0 0 1px var(--wood-darkest),
+                    0 0 0 4px var(--stone),
+                    0 0 0 5px var(--wood-darkest),
+                    0 10px 26px rgba(0, 0, 0, 0.65);
+}
+
+/* ---------------------------- page shell ---------------------------- */
+
+html, body.fey-page {
+    min-height: 100%;
+}
+
+body.fey-page {
+    margin: 0;
+    padding: 0;
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 16px;
+    background-color: var(--wood-darkest);
+    background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(58, 40, 22, 0.45), rgba(14, 10, 5, 0.86) 75%),
+        url("/screenshot.png");
+    background-repeat: no-repeat, repeat;
+    background-size: cover, 1196px 776px;
+    background-position: center top, center top;
+    background-attachment: fixed, fixed;
+}
+
+/* darkened vignette so parchment panels always read */
+body.fey-page::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(ellipse at 50% 35%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+body.fey-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+.fey-shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 26px 16px 48px 16px;
+}
+
+.fey-shell-wide {
+    max-width: 1180px;
+}
+
+/* --------------------------- top menu bar --------------------------- */
+
+#top-main-menu {
+    position: relative;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    color: var(--parchment);
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    background-color: var(--wood-dark);
+    background-image:
+        repeating-linear-gradient(92deg,
+            rgba(0, 0, 0, 0.10) 0px, rgba(0, 0, 0, 0) 5px,
+            rgba(255, 255, 255, 0.022) 13px, rgba(0, 0, 0, 0) 26px),
+        linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 45%, var(--wood-dark) 100%);
+    border-bottom: 3px solid var(--wood-darkest);
+    box-shadow: inset 0 -6px 10px rgba(0, 0, 0, 0.45),
+                0 3px 0 var(--gold-dim),
+                0 6px 14px rgba(0, 0, 0, 0.5);
+}
+
+#top-main-menu div {
+    padding: 11px 18px;
+}
+
+#top-main-menu a {
+    color: var(--gold-light);
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#top-main-menu a:hover {
+    color: #fff3cd;
+    text-decoration: underline;
+}
+
+#top-main-menu b a {
+    font-size: 17px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.username-main-menu {
+    color: var(--parchment-shade);
+}
+
+.username-main-menu .fey-user {
+    color: var(--gold-light);
+    font-weight: bold;
+}
+
+/* ------------------------------ titles ------------------------------ */
+
+h1, h2, h3, .fey-title {
+    font-family: var(--font-display);
+    font-weight: normal;
+    letter-spacing: 0.08em;
+    color: var(--gold-light);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.85),
+                 0 0 18px rgba(195, 155, 40, 0.35);
+}
+
+h1.fey-title {
+    margin: 26px 0 6px 0;
+    font-size: 40px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.fey-subtitle {
+    margin: 0 auto 18px auto;
+    max-width: 640px;
+    color: var(--parchment-shade);
+    font-style: italic;
+    font-size: 15px;
+}
+
+/* gold rule with a hex/diamond ornament, echoing the map grid */
+.fey-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 14px auto 22px auto;
+    max-width: 460px;
+    color: var(--gold-dim);
+}
+
+.fey-rule::before,
+.fey-rule::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(195, 155, 40, 0) 0%, var(--gold-dim) 50%, rgba(195, 155, 40, 0) 100%);
+}
+
+.fey-rule span {
+    width: 12px;
+    height: 14px;
+    background: var(--gold);
+    box-shadow: 0 0 8px rgba(195, 155, 40, 0.6);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+/* ------------------------------ panels ------------------------------ */
+
+.fey-panel {
+    position: relative;
+    margin: 0 auto 20px auto;
+    padding: 22px 26px;
+    color: var(--parchment);
+    background-color: var(--stone-dark);
+    /* fine granite speckle: fixed-size tiles so it never blows up on large panels */
+    background-image:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0) 2px),
+        radial-gradient(circle at 70% 65%, rgba(0, 0, 0, 0.14) 0 1.5px, rgba(0, 0, 0, 0) 2.5px),
+        linear-gradient(170deg, #4c4740 0%, #35322b 55%, #24211c 100%);
+    background-size: 37px 41px, 53px 59px, auto;
+    border: 2px solid var(--stone-light);
+    border-radius: 3px;
+    box-shadow: var(--frame-shadow);
+}
+
+.fey-panel-wood {
+    background-color: var(--wood);
+    background-image:
+        repeating-linear-gradient(178deg,
+            rgba(0, 0, 0, 0.11) 0px, rgba(0, 0, 0, 0) 7px,
+            rgba(255, 255, 255, 0.022) 17px, rgba(0, 0, 0, 0) 34px),
+        linear-gradient(160deg, var(--wood-light) 0%, var(--wood) 50%, var(--wood-dark) 100%);
+    background-size: auto;
+    border-color: var(--wood-light);
+}
+
+.fey-panel-parchment {
+    color: var(--ink);
+    background-color: var(--parchment);
+    background-image:
+        radial-gradient(circle at 12% 16%, rgba(120, 92, 46, 0.13) 0 18%, rgba(0, 0, 0, 0) 19%),
+        radial-gradient(circle at 82% 74%, rgba(120, 92, 46, 0.10) 0 22%, rgba(0, 0, 0, 0) 23%),
+        linear-gradient(165deg, #f2e7c8 0%, var(--parchment) 45%, var(--parchment-shade) 100%);
+    background-size: auto;
+    border: 2px solid var(--parchment-edge);
+    box-shadow: inset 0 0 30px rgba(120, 92, 46, 0.28),
+                0 0 0 1px var(--wood-darkest),
+                0 0 0 5px var(--wood),
+                0 0 0 6px var(--wood-darkest),
+                0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+.fey-panel-parchment a,
+.fey-panel.fey-panel-parchment a,
+#create-dialog-inner a {
+    color: #7a3d12;
+    text-decoration: underline;
+}
+
+.fey-panel.fey-panel-parchment a:hover {
+    color: #a5501a;
+}
+
+.fey-panel-parchment h1,
+.fey-panel-parchment h2,
+.fey-panel-parchment h3 {
+    color: #5c3210;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.fey-panel-heading {
+    margin: -22px -26px 18px -26px;
+    padding: 10px 26px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+    background-image:
+        repeating-linear-gradient(92deg,
+            rgba(0, 0, 0, 0.09) 0px, rgba(0, 0, 0, 0) 6px,
+            rgba(255, 255, 255, 0.02) 14px, rgba(0, 0, 0, 0) 28px),
+        linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border-bottom: 2px solid var(--wood-darkest);
+    box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ------------------------- buttons / options ------------------------- */
+
+.fey-button,
+button,
+input[type="submit"],
+input[type="button"] {
+    display: inline-block;
+    padding: 10px 22px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--gold-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+    background-color: var(--wood);
+    background-image:
+        repeating-linear-gradient(92deg,
+            rgba(0, 0, 0, 0.09) 0px, rgba(0, 0, 0, 0) 5px,
+            rgba(255, 255, 255, 0.025) 12px, rgba(0, 0, 0, 0) 24px),
+        linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 55%, var(--wood-dark) 100%);
+    border: 2px solid var(--wood-darkest);
+    border-top-color: #7d5936;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+                0 2px 0 var(--wood-darkest),
+                0 5px 12px rgba(0, 0, 0, 0.5);
+}
+
+.fey-button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    color: #fff4d2;
+    background-image:
+        repeating-linear-gradient(92deg,
+            rgba(0, 0, 0, 0.08) 0px, rgba(0, 0, 0, 0) 5px,
+            rgba(255, 255, 255, 0.035) 12px, rgba(0, 0, 0, 0) 24px),
+        linear-gradient(180deg, #85603a 0%, #5b4028 55%, #35240f 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.45),
+                0 2px 0 var(--wood-darkest),
+                0 0 16px rgba(195, 155, 40, 0.35);
+}
+
+.fey-button:active,
+button:active,
+input[type="submit"]:active,
+input[type="button"]:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled {
+    color: #8f8367;
+    background-image: linear-gradient(180deg, #4a463c 0%, #35322b 60%, #26241f 100%);
+    border-color: #1a1814;
+    border-top-color: #555044;
+    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.fey-button-primary {
+    color: #fff6da;
+    background-image:
+        repeating-linear-gradient(92deg,
+            rgba(0, 0, 0, 0.08) 0px, rgba(0, 0, 0, 0) 5px,
+            rgba(255, 255, 255, 0.03) 12px, rgba(0, 0, 0, 0) 24px),
+        linear-gradient(180deg, #6f5417 0%, #5a4212 55%, #38280a 100%);
+    border-top-color: var(--gold);
+}
+
+/* big stacked menu choices on the front page */
+div.option {
+    max-width: 520px;
+    margin: 10px auto;
+    padding: 0;
+    background: none;
+}
+
+.main-content a.option,
+a.fey-option {
+    display: block;
+    padding: 15px 20px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    color: var(--gold-light);
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
+    background-color: var(--wood);
+    background-image:
+        repeating-linear-gradient(92deg,
+            rgba(0, 0, 0, 0.09) 0px, rgba(0, 0, 0, 0) 6px,
+            rgba(255, 255, 255, 0.025) 14px, rgba(0, 0, 0, 0) 28px),
+        linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 55%, var(--wood-dark) 100%);
+    border: 2px solid var(--wood-darkest);
+    border-top-color: #7d5936;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14),
+                inset 0 -4px 8px rgba(0, 0, 0, 0.5),
+                0 3px 0 var(--wood-darkest),
+                0 6px 16px rgba(0, 0, 0, 0.5);
+    transition: color 0.12s, box-shadow 0.12s;
+}
+
+.main-content a.option:hover,
+a.fey-option:hover {
+    color: #fff4d2;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -4px 8px rgba(0, 0, 0, 0.45),
+                0 3px 0 var(--wood-darkest),
+                0 0 20px rgba(195, 155, 40, 0.45);
+}
+
+.main-content a.option::before,
+a.fey-option::before {
+    content: "";
+    display: inline-block;
+    width: 13px;
+    height: 15px;
+    margin-right: 14px;
+    vertical-align: middle;
+    background-image: linear-gradient(165deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dim) 100%);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+/* ------------------------------ forms ------------------------------ */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input:not([type]),
+select,
+textarea {
+    padding: 8px 10px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--ink);
+    background-color: var(--parchment);
+    background-image: linear-gradient(180deg, #f3e9cd 0%, var(--parchment) 60%, var(--parchment-shade) 100%);
+    border: 2px solid var(--wood-dark);
+    border-radius: 2px;
+    box-shadow: inset 0 2px 5px rgba(90, 68, 32, 0.4);
+    outline: none;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input:not([type]):focus,
+select:focus,
+textarea:focus {
+    border-color: var(--gold);
+    box-shadow: inset 0 2px 5px rgba(90, 68, 32, 0.35),
+                0 0 10px rgba(195, 155, 40, 0.55);
+}
+
+select {
+    padding: 7px 8px;
+}
+
+.fey-field {
+    display: block;
+    margin: 0 0 14px 0;
+    text-align: left;
+}
+
+.fey-field label,
+label {
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+}
+
+.fey-panel:not(.fey-panel-parchment) .fey-field label {
+    color: var(--parchment-shade);
+}
+
+.fey-field input {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+.fey-form-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* iron-bound checkbox with a mossy rune when set */
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: linear-gradient(180deg, #f3e9cd 0%, var(--parchment) 60%, var(--parchment-shade) 100%);
+    border: 2px solid var(--wood-dark);
+    border-radius: 2px;
+    box-shadow: inset 0 2px 4px rgba(90, 68, 32, 0.4);
+}
+
+input[type="checkbox"]:checked {
+    background-image: linear-gradient(180deg, #6d9450 0%, var(--moss) 60%, #33501f 100%);
+    border-color: #23361a;
+}
+
+input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 6px;
+    height: 11px;
+    border: solid #f2ffe6;
+    border-width: 0 3px 3px 0;
+    transform: rotate(42deg);
+}
+
+input[type="checkbox"]:focus {
+    box-shadow: inset 0 2px 4px rgba(90, 68, 32, 0.35),
+                0 0 8px rgba(195, 155, 40, 0.6);
+}
+
+/* messages */
+
+.fey-error {
+    margin: 0 auto 18px auto;
+    padding: 10px 14px;
+    color: #ffdcd2;
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    background-image: linear-gradient(180deg, #7c1f1f 0%, #4d1212 100%);
+    border: 2px solid var(--blood-light);
+    border-radius: 2px;
+    box-shadow: inset 0 -3px 8px rgba(0, 0, 0, 0.45),
+                0 0 14px rgba(141, 32, 32, 0.5);
+}
+
+.fey-note {
+    color: var(--parchment-shade);
+    font-size: 14px;
+}
+
+/* -------------------------- shared fragments -------------------------- */
+
+.fey-hex {
+    display: inline-block;
+    width: 14px;
+    height: 16px;
+    background: var(--stone-light);
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.fey-scroll-links {
+    max-width: 720px;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--gold-light);
+}
+
+a:hover {
+    color: #fff4d2;
+}
+
+/* scrollbars inside panels, kept in the iron/wood register */
+.fey-scrollable::-webkit-scrollbar {
+    width: 12px;
+}
+
+.fey-scrollable::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.fey-scrollable::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border: 1px solid var(--wood-darkest);
+}
+
+@media (max-width: 640px) {
+    h1.fey-title { font-size: 28px; }
+    .fey-panel { padding: 16px; }
+    .fey-panel-heading { margin: -16px -16px 14px -16px; padding: 9px 16px; }
+}

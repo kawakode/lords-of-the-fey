@@ -5,9 +5,9 @@
 
     <div class="username-main-menu" style="float: right;">
       {{#if username}}
-          {{#if username}}{{username}}{{/if}} | <a style="color:white;" href="/logout">Log out</a>
+          <span class="fey-user">{{username}}</span> &#9670; <a href="/logout">Log out</a>
       {{else}}
-          <a href="login.html">Log in</a> / <a href="signup.html">Sign up</a>
+          <a href="login.html">Log in</a> &#9670; <a href="signup.html">Sign up</a>
       {{/if}}
     </div>
   </div>

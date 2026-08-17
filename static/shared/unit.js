@@ -69,23 +69,47 @@
 */
 var unitLib = {
     /** */
-    protoList: ["orcish_grunt", "orcish_warrior", "orcish_warlord", "elvish_scout", "elvish_rider", "elvish_outrider", "elvish_archer", "elvish_ranger", "elvish_avenger", "elvish_marksman", "elvish_sharpshooter", "elvish_shaman", "elvish_fighter", "elvish_captain", "elvish_marshal", "elvish_hero", "elvish_champion", "orcish_archer", "orcish_crossbowman", "orcish_slurbow", "orcish_assassin", "orcish_slayer", "naga_fighter", "naga_warrior", "naga_myrmidon", "wolf_rider", "goblin_knight", "goblin_pillager", "direwolf_rider", "troll_whelp", "troll", "troll_warrior", "troll_rocklobber", "goblin_spearman", "goblin_impaler", "goblin_rouser", "wose", "elder_wose", "ancient_wose", "mage", "white_mage", "mage_of_light", "red_mage", "arch_mage", "great_mage", "silver_mage","merman_hunter", "merman_spearman", "merman_javelineer", "merman_netcaster", "merman_entangler"],
+    protoList: ["ancient_wose", "arch_mage", "assassin", "banebow", "blood_bat", "bone_shooter", "bowman", "cavalier", "cavalryman", "dark_adept", "dark_sorcerer", "deathblade", "direwolf_rider", "dragoon", "drake_arbiter", "drake_blademaster", "drake_burner", "drake_clasher", "drake_enforcer", "drake_fighter", "drake_flameheart", "drake_flare", "drake_glider", "drake_thrasher", "drake_warden", "drake_warrior", "draug", "dread_bat", "duelist", "dwarvish_berserker", "dwarvish_dragonguard", "dwarvish_explorer", "dwarvish_fighter", "dwarvish_guardsman", "dwarvish_lord", "dwarvish_pathfinder", "dwarvish_scout", "dwarvish_sentinel", "dwarvish_stalwart", "dwarvish_steelclad", "dwarvish_thunderer", "dwarvish_thunderguard", "dwarvish_ulfserker", "elder_wose", "elvish_archer", "elvish_avenger", "elvish_captain", "elvish_champion", "elvish_druid", "elvish_enchantress", "elvish_fighter", "elvish_hero", "elvish_marksman", "elvish_marshal", "elvish_outrider", "elvish_ranger", "elvish_rider", "elvish_scout", "elvish_shaman", "elvish_sharpshooter", "elvish_shyde", "elvish_sorceress", "elvish_sylph", "fencer", "fire_drake", "footpad", "fugitive", "general", "ghast", "ghost", "ghoul", "goblin_impaler", "goblin_knight", "goblin_pillager", "goblin_rouser", "goblin_spearman", "grand_knight", "grand_marshal", "great_mage", "gryphon_master", "gryphon_rider", "halberdier", "heavy_infantryman", "horseman", "huntsman", "hurricane_drake", "inferno_drake", "iron_mauler", "javelineer", "knight", "lancer", "lich", "lieutenant", "longbowman", "mage", "mage_of_light", "master_at_arms", "master_bowman", "merman_entangler", "merman_fighter", "merman_hoplite", "merman_hunter", "merman_javelineer", "merman_netcaster", "merman_spearman", "merman_triton", "merman_warrior", "naga_fighter", "naga_myrmidon", "naga_warrior", "necromancer", "necrophage", "nightgaunt", "orcish_archer", "orcish_assassin", "orcish_crossbowman", "orcish_grunt", "orcish_nightblade", "orcish_slayer", "orcish_slurbow", "orcish_warlord", "orcish_warrior", "outlaw", "paladin", "pikeman", "poacher", "ranger", "red_mage", "revenant", "rogue", "royal_guard", "saurian_ambusher", "saurian_augur", "saurian_flanker", "saurian_oracle", "saurian_prophet", "saurian_seer", "saurian_skirmisher", "saurian_soothsayer", "shadow", "shock_trooper", "silver_mage", "skeleton", "skeleton_archer", "sky_drake", "soulless", "spearman", "spectre", "swordsman", "thief", "trapper", "troll", "troll_rocklobber", "troll_warrior", "troll_whelp", "vampire_bat", "walking_corpse", "white_mage", "wolf_rider", "wose", "wraith"],
     protos: {},
 
     /**
        @memberof unitLib
        @param initCallback - called when all unit data has finished
        @param progressCallback - called each time a prototype loads
+       @param {string[]} [neededTypes] - unit types this game can actually field.
+         Stats are loaded for every type either way (they are small), but images
+         and sprite sheets are only fetched for these types and everything they
+         can advance into. Omit to load images for every type.
     */
-    init: function(initCallback, progressCallback) {
+    init: function(initCallback, progressCallback, neededTypes) {
         if(typeof createjs != "undefined") {
-            this.clientInit(initCallback, progressCallback);
+            this.clientInit(initCallback, progressCallback, neededTypes);
         } else {
             this.serverInit(initCallback);
         }
     },
 
-    clientInit: function(initCallback, progressCallback) {
+    /**
+       Expand a list of unit types to include everything they can advance into.
+       @memberof unitLib
+    */
+    withAdvancements: function(types) {
+        var included = {};
+        var pending = types.slice();
+
+        while(pending.length) {
+            var type = pending.shift();
+            if(!type || included[type]) { continue; }
+            included[type] = true;
+
+            var proto = unitLib.protos[type];
+            if(proto && proto.advancesTo) { pending.push.apply(pending, proto.advancesTo); }
+        }
+
+        return Object.keys(included);
+    },
+
+    clientInit: function(initCallback, progressCallback, neededTypes) {
         // load unit data files
         var queue = new createjs.LoadQueue();
         queue.on("progress", progressCallback);
@@ -107,15 +131,21 @@ var unitLib = {
 
         // when all data files have loaded, load images
         queue.on("complete", function() {
+            // Mainline Wesnoth has over 150 unit types; a single game only ever
+            // sees the handful its factions can field, so only those get pictures.
+            var drawnTypes = neededTypes && neededTypes.length
+                           ? unitLib.withAdvancements(neededTypes).filter(function(k) { return unitLib.protos[k]; })
+                           : Object.keys(unitLib.protos);
+
             var queue = new createjs.LoadQueue();
             queue.on("progress", progressCallback);
             queue.on("complete", handleComplete, this);
             queue.loadManifest(
-                Object.keys(unitLib.protos).map(function(k){ return {id:k, src: unitLib.protos[k].sprite || unitLib.protos[k].img }; })
+                drawnTypes.map(function(k){ return {id:k, src: unitLib.protos[k].sprite || unitLib.protos[k].img }; })
             );
 
             var attackAnimationList = [];
-            for(var p in unitLib.protos) {
+            drawnTypes.forEach(function(p) {
                 var proto = unitLib.protos[p];
                 for(var a=0; a < proto.attacks.length; ++a) {
                     var attackObj = proto.attacks[a];
@@ -124,12 +154,14 @@ var unitLib = {
                         attackAnimationList.push({ id: p+"|"+a+"|"+direction, src: imgPath });
                     }
                 }
-            }
+            });
             queue.loadManifest(attackAnimationList);
 
             function handleComplete() {
-                for(var k in unitLib.protos) {
+                for(var index=0; index<drawnTypes.length; ++index) {
+                    var k = drawnTypes[index];
                     var img = queue.getResult(k);
+                    if(!img) { continue; }
                     unitLib.protos[k].imgObj = img;
                     unitLib.protos[k].colorImgList = [img];
 
@@ -354,20 +386,35 @@ function Unit(unitData, isCreation, isLevelUp) {
 
         unit.shape = new createjs.Container();
         unit.shape.owner = unit;
+        // Build this unit's sprite animation table. Unit types declare animations as
+        // [firstFrame, lastFrame] pairs, either under "animations" (death, defence...)
+        // or on an individual attack. Frame 0 is always the standing frame, and every
+        // animation returns to it -- except death, which holds its final frame.
+        //
+        // The table is rebuilt rather than edited in place: the declared ranges live on
+        // the shared unit-type prototype, so mutating them would corrupt every other
+        // unit of the same type.
+        var makeAnimation = function(range, nextAnimation) {
+            return [range[0], range[1], nextAnimation];
+        };
+
+        var animations = { stand: 0 };
+
+        for(var animationName in unit.animations) {
+            var range = unit.animations[animationName];
+            if(!range || range.length < 2) { continue; }
+            animations[animationName] = makeAnimation(range, animationName == "die" ? false : "stand");
+        }
+
         for(var i=0; i<unit.attacks.length; i++) {
             if(unit.attacks[i].animation) {
-                unit.attacks[i].animation.push("stand");
-                unit.animations["attack-"+i] = unit.attacks[i].animation;
+                animations["attack-"+i] = makeAnimation(unit.attacks[i].animation, "stand");
             }
         }
-        
-        if(unit.animations) {
-            unit.animations.stand = 0;
-            for(var animation in unit.animations) {
-                if(animation.push) { animation.push("stand"); }
-            }
-        }
-        var sheet = new createjs.SpriteSheet({ images: [unit.imgObj], frames: { height: 72, width: 72 }, animations: unit.animations });
+
+        unit.animations = animations;
+
+        var sheet = new createjs.SpriteSheet({ images: [unit.imgObj], frames: { height: 72, width: 72 }, animations: animations });
         unit.bodyShape = new createjs.Sprite(sheet);
         unit.bodyShape.addEventListener("change", function() { unit.bodyShape.cache(0,0,72,72); });
         unit.shape.addChild(unit.bodyShape);

@@ -1,13 +1,14 @@
 var socketOwnerCanAct = require("./auth").socketOwnerCanAct;
 var loadMap = require("./loadUtils").loadMap;
 var Unit = require("./static/shared/unit.js").Unit;
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return require('mongodb').ObjectID.apply(this, arguments); }
+var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
 var unitLib = require("./static/shared/unit.js").unitLib;
 var Terrain = require("./static/shared/terrain.js").Terrain;
+var resumePlannedMoves = require("./executePath").resumePlannedMoves;
 
 module.exports = function(collections, data, socket, socketList) {
     var gameId = ObjectID(data.gameId);
-        collections.games.findOne({_id:gameId}, function(err, game) {
+        collections.games.findOne({_id:gameId}).then(function(game) {
             if(!game) { socket.emit("no game"); return; }
 
             if(!socketOwnerCanAct(socket, game)) {
@@ -34,10 +35,8 @@ module.exports = function(collections, data, socket, socketList) {
             }
 
             // find all units owned by the newly active player
-            collections.units.find({ gameId: gameId, team: game.activeTeam }, function(err, unitCursor) {
-                unitCursor.toArray(doUpdates);
-            });
-            function doUpdates(err, unitList) {
+            collections.units.find({ gameId: gameId, team: game.activeTeam }).toArray().then(doUpdates);
+            function doUpdates(unitList) {
                 unitList = unitList.map(function(u) { return new Unit(u); });
                 var unitsIndexedBySpace = unitList.reduce(function(result, u) { result[u.x+","+u.y] = u; return result; }, {});
 
@@ -55,15 +54,16 @@ module.exports = function(collections, data, socket, socketList) {
                 game.players[game.activeTeam - 1].gold += 2 + villageCount*2 - costlyUnitCount;
                 //console.log("gold", game.players[game.activeTeam - 1].gold, 2 + villageCount*2 - costlyUnitCount);
 
-                collections.games.save(game, { safe: true }, function() {
+                collections.games.replaceOne({ _id: game._id }, game).then(function() {
                     var updates = {};
                     var finishUpdates = function() {
-                        (function saveUnitFromList (i) {
-                            if(unitList[i] == undefined) { sendUpdates(); return; }
-                            collections.units.save(unitList[i].getStorableObj(), {safe:true}, function() {
-                                saveUnitFromList(i+1);
-                            });
-                        })(0);
+                        (async function saveAllUnits() {
+                            for(var i=0; i<unitList.length; ++i) {
+                                var obj = unitList[i].getStorableObj();
+                                await collections.units.replaceOne({ _id: obj._id }, obj);
+                            }
+                            sendUpdates();
+                        })();
 
                         function sendUpdates() {
                             var hiddenUpdates = {};
@@ -99,6 +99,10 @@ module.exports = function(collections, data, socket, socketList) {
                                                                      updates: hiddenUpdates,
                                                                      timeOfDay: game.timeOfDay });
                             });
+
+                            // units with movement left over from a multi-turn plan
+                            // walk on now that their side has move points again
+                            resumePlannedMoves(collections, gameId, game, game.activeTeam, socketList);
                         }
                     };
                     

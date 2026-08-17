@@ -18,6 +18,7 @@
 */
 var loadMap = require("./loadUtils").loadMap;
 var Unit = require("./static/shared/unit.js").Unit;
+var factions = require("./factions");
 
 /*exports.initLobby = function(app, collections) {
     app.get('/create', function(req, res) {
@@ -68,8 +69,9 @@ exports.createNewGame = function(collections, playerList, map, resolutionCallbac
         gameData.alliances[playerItem.team] = playerItem.alliance;
 
         if(!("gold" in playerItem)) { playerItem.gold = 100; }
-        if(!("faction" in playerItem) || playerItem.faction == "random") { playerItem.faction = Math.random()>0.5?"elves":"orcs"; }
-        else { playerItem.faction = playerItem.faction.toLowerCase(); }
+        // resolve the requested faction to a known faction id; unknown or
+        // "random" requests get a random playable faction
+        playerItem.faction = factions.resolveId(playerItem.faction) || factions.randomId();
     }
 
     loadMap(map, function(err, mapData) {
@@ -84,19 +86,30 @@ exports.createNewGame = function(collections, playerList, map, resolutionCallbac
         }
 
         if(playerList.length > startPositions.length - 1) { resolutionCallback(false); return; }
-        
-        collections.games.insert([gameData], {safe: true}, function(err, items) {    
-            var game = items.ops[0];
-            var index = -1;
-            (function addCommander() {
-                index++;
-                if(index == playerList.length) { resolutionCallback(game._id); return; }
-                if(playerList[index].empty) { addCommander(); return; }
-                var typeName = playerList[index].faction=="elves"?"elvish_ranger":"orcish_warrior";
+
+        // every non-empty player needs a start position on the map; bail out before
+        // touching the database if the map cannot seat everyone
+        for(var index=0; index<playerList.length; ++index) {
+            if(playerList[index].empty) { continue; }
+            if(!startPositions[playerList[index].team]) {
+                console.error("createNewGame: map " + map + " has no start position " + playerList[index].team);
+                resolutionCallback(false);
+                return;
+            }
+        }
+
+        (async function() {
+            var result = await collections.games.insertOne(gameData);
+            var gameId = result.insertedId;
+
+            for(var index=0; index<playerList.length; ++index) {
+                if(playerList[index].empty) { continue; }
+                var faction = factions.byId[playerList[index].faction];
+                var typeName = (faction && faction.commanderList && faction.commanderList[0]) || "orcish_warrior";
                 var coords = startPositions[playerList[index].team];
-				
+
                 var unit = new Unit({
-                    gameId: game._id,
+                    gameId: gameId,
                     x: +coords[0],
                     y: +coords[1],
                     type: typeName,
@@ -105,10 +118,14 @@ exports.createNewGame = function(collections, playerList, map, resolutionCallbac
                 }, true);
                 unit.moveLeft = unit.move;
 
-                var data = unit.getStorableObj();
+                await collections.units.insertOne(unit.getStorableObj());
+            }
 
-                collections.units.insert(data, {safe:true}, addCommander)
-            })();
+            resolutionCallback(gameId);
+        })().catch(function(err) {
+            // an unhandled rejection here used to be rethrown by the driver and kill the process
+            console.error("createNewGame failed:", err);
+            resolutionCallback(false);
         });
     });
 }

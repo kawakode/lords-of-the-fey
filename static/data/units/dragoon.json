@@ -1,0 +1,114 @@
+{
+  "name": "Dragoon",
+  "img": "/data/img/units/dragoon.png",
+  "cost": 29,
+  "maxHp": 49,
+  "move": 9,
+  "maxXp": 80,
+  "level": 2,
+  "alignment": "lawful",
+  "advancesTo": [
+    "cavalier"
+  ],
+  "attacks": [
+    {
+      "name": "Sword",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 6,
+      "number": 4,
+      "icon": "/data/img/attacks/sword-human.png",
+      "animation": [
+        1,
+        9
+      ]
+    },
+    {
+      "name": "Crossbow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 12,
+      "number": 1,
+      "icon": "/data/img/attacks/crossbow-human.png",
+      "animation": [
+        10,
+        15
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "reef": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 3,
+      "cover": 1.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 4,
+      "cover": 1.8
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.3,
+    "pierce": -0.2,
+    "impact": 0.4,
+    "fire": 0.0,
+    "cold": 0.2,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/dragoon-sprite.png"
+}

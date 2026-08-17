@@ -16,10 +16,72 @@
     You should have received a copy of the GNU Affero General Public License
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/* ------------------------------------------------------------------
+   In-game skin: wood, stone, parchment, iron and gold.
+   The palette matches /css/theme.css (used by the out-of-game screens)
+   but the metrics here stay compact, since every pixel spent on chrome
+   is a pixel taken from the map.
+   ------------------------------------------------------------------ */
+
+:root {
+    --wood-darkest: #1b1008;
+    --wood-dark:    #2c1d10;
+    --wood:         #4a3320;
+    --wood-light:   #6d4c2c;
+
+    --iron-dark:    #16140f;
+    --iron:         #3a352c;
+    --iron-light:   #6b6355;
+
+    --stone-dark:   #2f2c26;
+    --stone:        #5b564b;
+    --stone-light:  #938c7c;
+
+    --parchment:       #e7d9b4;
+    --parchment-shade: #d2c096;
+    --parchment-edge:  #a8916a;
+
+    --ink:      #2a1f12;
+    --ink-soft: #4d3c25;
+
+    --gold:       #c39b28;
+    --gold-light: #f0d477;
+    --gold-dim:   #8a6c1b;
+
+    --moss:  #4f7136;
+    --blood: #8d2020;
+
+    --font-display: "Trajan Pro", "Cinzel", "Palatino Linotype", "Book Antiqua",
+                    Palatino, "Times New Roman", serif;
+    --font-body: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+
+    /* plank grain, reused on every wooden surface */
+    --grain-h: repeating-linear-gradient(92deg,
+                   rgba(0, 0, 0, 0.10) 0px, rgba(0, 0, 0, 0) 5px,
+                   rgba(255, 255, 255, 0.022) 13px, rgba(0, 0, 0, 0) 26px);
+    --grain-v: repeating-linear-gradient(178deg,
+                   rgba(0, 0, 0, 0.11) 0px, rgba(0, 0, 0, 0) 7px,
+                   rgba(255, 255, 255, 0.022) 17px, rgba(0, 0, 0, 0) 34px);
+
+    --wood-face: linear-gradient(180deg, var(--wood-light) 0%, var(--wood) 45%, var(--wood-dark) 100%);
+    --parchment-face: linear-gradient(165deg, #f2e7c8 0%, var(--parchment) 45%, var(--parchment-shade) 100%);
+}
+
+/* The board is sized to the window, so it never needs to scroll sideways.
+   Suppressing the horizontal scrollbar also keeps a stray overflowing pixel
+   from stealing width back from the canvas. */
+html {
+    overflow-x: hidden;
+}
+
 body {
     padding: 0;
     margin: 0;
-    font-family: sans-serif;
+    overflow-x: hidden;
+    color: var(--parchment);
+    font-family: var(--font-body);
+    background-color: var(--wood-darkest);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -29,71 +91,560 @@ body {
 }
 
 canvas {
-      background-color: black;
+    background-color: #070a06;
 }
 
+/* the map canvas is a block so it does not pick up an inline-layout gap
+   under it (the resize math budgets no room for one) */
+canvas#c {
+    display: block;
+}
+
+/* ------------------------------ top bar ------------------------------ */
+
+#top-bar {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 4px 2px 4px;
+    /* visible, not clipped: the hover tips hang below the plaques */
+    overflow: visible;
+    z-index: 100;
+    background-color: var(--wood-dark);
+    background-image: var(--grain-h), var(--wood-face);
+    border-bottom: 3px solid var(--wood-darkest);
+    box-shadow: inset 0 -7px 12px rgba(0, 0, 0, 0.45),
+                0 3px 0 var(--gold-dim),
+                0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+/* ------------------------------ hover tips ------------------------------ */
+
+/* anything carrying data-tip unrolls a parchment scrap under the cursor.
+   Pseudo-elements do not render on replaced elements, so data-tip belongs on a
+   div or span, never on an <img>, <canvas> or <input> (those use title=""). */
+[data-tip] {
+    position: relative;
+}
+
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 9px);
+    left: -4px;
+    z-index: 300;
+    width: -moz-max-content;
+    width: max-content;
+    max-width: 250px;
+    padding: 7px 10px;
+    white-space: pre-line;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1.45;
+    color: var(--ink);
+    text-shadow: none;
+    background-color: var(--parchment);
+    background-image: var(--parchment-face);
+    border: 1px solid var(--parchment-edge);
+    box-shadow: inset 0 0 16px rgba(120, 92, 46, 0.3),
+                0 0 0 1px var(--wood-darkest),
+                0 0 0 4px var(--wood),
+                0 0 0 5px var(--wood-darkest),
+                0 8px 20px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    /* kept in the tree but out of sight, so it can fade in on hover */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s linear;
+}
+
+[data-tip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* tips near the right edge open inwards, so they never widen the page */
+#top-username[data-tip]::after,
+#right-column [data-tip]::after {
+    left: auto;
+    right: -4px;
+}
+
+/* iron plaques riveted to the plank */
 div.top-status {
     float: left;
+    box-sizing: content-box;
     width: 60px;
     height: 16px;
-    background-color: #000000;
-    color: #FFFFFF;
-    padding: 0px 2px 6px 2px;
+    padding: 3px 5px 5px 5px;
     margin: 5px 3px;
+    white-space: nowrap;
+    cursor: help;
+    font-family: var(--font-display);
     font-size: 12px;
+    letter-spacing: 0.03em;
+    color: var(--parchment);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.9);
+    background-color: var(--iron);
+    background-image: linear-gradient(180deg, #4a453a 0%, var(--iron) 55%, #201d17 100%);
+    border: 1px solid var(--wood-darkest);
+    border-top-color: var(--iron-light);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.45),
+                0 1px 0 rgba(0, 0, 0, 0.55);
+}
+
+/* wrappers that hold a control or plain text rather than a stat */
+div.top-status.top-status-bare {
+    width: auto;
+    padding: 0;
+    cursor: default;
+    background: none;
+    border: none;
+    box-shadow: none;
 }
 
 #top-active-team {
-    padding: 3px 2px 3px;
     width: 40px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 #top-active-color {
-    width: 15px;
-    height: 15px;
-    border-radius: 10px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
     float: left;
-    background-color: white;
-    margin-right: 4px;
+    background-color: #fff;
+    margin: 1px 5px 0 0;
+    box-shadow: 0 0 0 1px var(--wood-darkest),
+                0 0 0 2px var(--gold-dim),
+                inset 0 -2px 3px rgba(0, 0, 0, 0.5),
+                inset 0 2px 3px rgba(255, 255, 255, 0.45);
 }
 
+/* holds the time-of-day name, whose length varies ("Dawn".."Second Watch") */
 #top-turn-count {
-    width: 50px;
+    width: auto;
+    min-width: 50px;
+}
+
+#top-village-count,
+#top-upkeep {
+    width: 70px;
 }
 
 div.top-status img {
     position: relative;
     top: 3px;
+    opacity: 0.92;
 }
 
-div#right-column {
-    width:125px;
-    height: 450px;
-    background-color:#999999; 
-    border: thin black solid;
-    border-left: none;
-    border-bottom: none;
-    padding:10px;
+#top-username {
     float: right;
+    width: auto;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+/* -------------------------- top menu / dropdown -------------------------- */
+
+#top-menu-button,
+#end-turn-button,
+button,
+input[type="button"] {
+    font-family: var(--font-display);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+    background-color: var(--wood);
+    background-image: var(--grain-h), var(--wood-face);
+    border: 2px solid var(--wood-darkest);
+    border-top-color: #7d5936;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+                0 2px 0 var(--wood-darkest),
+                0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+button:hover,
+input[type="button"]:hover {
+    color: #fff4d2;
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #85603a 0%, #5b4028 55%, #35240f 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.45),
+                0 2px 0 var(--wood-darkest),
+                0 0 14px rgba(195, 155, 40, 0.4);
+}
+
+button:active,
+input[type="button"]:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+button:disabled,
+input[type="button"]:disabled {
+    color: #8f8367;
+    background-image: linear-gradient(180deg, #4a463c 0%, #35322b 60%, #26241f 100%);
+    border-color: var(--iron-dark);
+    border-top-color: #555044;
+    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.5);
+    cursor: not-allowed;
+    transform: none;
+}
+
+#top-menu-button {
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+#top-menu-list {
+    box-sizing: border-box;
+    width: 164px;
+    height: auto;
+    position: absolute;
+    top: 41px;
+    left: 7px;
+    z-index: 110;
+    padding: 4px;
+    display: none;
+    color: var(--parchment);
+    background-color: var(--wood-dark);
+    background-image: var(--grain-v),
+                      linear-gradient(160deg, var(--wood) 0%, var(--wood-dark) 60%, var(--wood-darkest) 100%);
+    border: 2px solid var(--wood-darkest);
+    border-top-color: var(--wood-light);
+    box-shadow: inset 0 0 0 1px rgba(240, 212, 119, 0.18),
+                0 10px 22px rgba(0, 0, 0, 0.65);
+}
+
+#top-menu-animation-speed-group {
     position: relative;
-    font-size: 10pt;
+}
+
+.top-menu-item {
+    height: auto;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    padding: 7px 10px;
+    color: var(--parchment);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.top-menu-item:last-child {
+    border-bottom: none;
+}
+
+.top-menu-item:hover {
+    color: #fff4d2;
+    background-image: linear-gradient(180deg, rgba(240, 212, 119, 0.22), rgba(138, 108, 27, 0.28));
+    box-shadow: inset 0 0 0 1px rgba(240, 212, 119, 0.35);
+}
+
+#animation-speed-menu {
+    box-sizing: border-box;
+    width: 150px;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    margin-left: 4px;
+    padding: 4px;
+    display: none;
+    background-color: var(--wood-dark);
+    background-image: var(--grain-v),
+                      linear-gradient(160deg, var(--wood) 0%, var(--wood-dark) 60%, var(--wood-darkest) 100%);
+    border: 2px solid var(--wood-darkest);
+    border-top-color: var(--wood-light);
+    box-shadow: inset 0 0 0 1px rgba(240, 212, 119, 0.18),
+                0 10px 22px rgba(0, 0, 0, 0.65);
+}
+
+#top-menu-animation-speed-group:hover #animation-speed-menu {
+    display: block;
+}
+
+/* keeps the ✓ from shifting the labels when it appears */
+.speed-mark {
+    display: inline-block;
+    width: 15px;
+    color: var(--gold-light);
+}
+
+#top-menu-sound {
+    color: #8f8367;
+}
+
+#top-menu-sound:hover {
+    color: #8f8367;
+    background-image: none;
+    box-shadow: none;
+}
+
+/* --------------------------- right status column --------------------------- */
+
+/* Positioned, not floated. A float would push the canvas onto the next line the
+   moment the two stopped fitting side by side (a replaced box will not sit
+   under a float), and since a scrollbar appearing does not fire `resize`,
+   nothing would ever put the board back. `top` is set in
+   World.fitBoardToWindow, under the top bar. */
+div#right-column {
+    box-sizing: content-box;
+    width: 125px;
+    height: 450px;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--parchment);
+    background-color: var(--stone-dark);
+    /* granite speckle over a slab gradient */
+    background-image:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0) 2px),
+        radial-gradient(circle at 70% 65%, rgba(0, 0, 0, 0.16) 0 1.5px, rgba(0, 0, 0, 0) 2.5px),
+        linear-gradient(170deg, #4c4740 0%, #35322b 55%, #24211c 100%);
+    background-size: 37px 41px, 53px 59px, auto;
+    border: none;
+    border-left: 3px solid var(--wood-darkest);
+    box-shadow: inset 3px 0 0 var(--gold-dim),
+                inset 8px 0 16px rgba(0, 0, 0, 0.5);
+}
+
+#right-column b,
+#right_data_name {
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    color: var(--gold-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* iron-framed panes: minimap, time of day, unit portrait */
+#minimap,
+#right_time_of_day,
+#right-column .img-wrapper {
+    box-shadow: 0 0 0 1px var(--wood-darkest),
+                0 0 0 3px var(--iron),
+                0 0 0 4px var(--wood-darkest),
+                0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+#minimap {
+    display: block;
+    margin: 2px auto 10px auto;
+    background-color: #0c0f0a;
+}
+
+#right_time_of_day {
+    display: block;
+    margin: 0 auto 8px auto;
+    max-width: 100%;
+}
+
+#right-column .img-wrapper {
+    background-color: #1a1712;
+    background-image: radial-gradient(circle at 50% 35%, rgba(240, 212, 119, 0.10), rgba(0, 0, 0, 0) 70%);
+}
+
+#right_data_hp_container,
+#right_data_move_container {
+    cursor: help;
+}
+
+#right_data_hp,
+#right_data_xp,
+#right_data_move {
+    display: inline-block;
+    margin-left: 4px;
+    font-family: var(--font-display);
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+#right_data_attributes {
+    font-style: italic;
+    color: var(--parchment-shade);
+}
+
+#right_data_attacks {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(240, 212, 119, 0.22);
+}
+
+#right_data_attacks > div:nth-child(3n+1) {
+    margin-top: 3px;
+    color: var(--gold-light);
 }
 
 #end-turn-button {
     position: absolute;
     bottom: 0;
-    font-size: 13pt;
+    box-sizing: border-box;
     width: 125px;
+    padding: 9px 0;
+    font-size: 14px;
+    color: #fff6da;
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #7c5c19 0%, #5a4212 55%, #38280a 100%);
+    border-top-color: var(--gold);
+}
+
+#end-turn-button:hover:enabled {
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #96701f 0%, #6b4f13 55%, #402d0b 100%);
+}
+
+/* -------------------------- hover tooltips (parchment scraps) -------------------------- */
+
+#right_data_move_costs,
+#right_data_resistances {
+    display: none;
+    position: absolute;
+    z-index: 99;
+    padding: 6px 8px;
+    font-size: 11px;
+    color: var(--ink);
+    background-color: var(--parchment);
+    background-image: var(--parchment-face);
+    border: 1px solid var(--parchment-edge);
+    box-shadow: inset 0 0 18px rgba(120, 92, 46, 0.3),
+                0 0 0 1px var(--wood-darkest),
+                0 0 0 4px var(--wood),
+                0 0 0 5px var(--wood-darkest),
+                0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+#right_data_move_costs {
+    left: -158px;
+    top: 0;
+}
+
+#right_data_resistances {
+    left: -148px;
+    top: 130px;
+}
+
+#right_data_move_costs table,
+#right_data_resistances table {
+    border-collapse: collapse;
+}
+
+#right_data_move_costs td,
+#right_data_resistances td {
+    padding: 1px 4px 1px 0;
+    white-space: nowrap;
+}
+
+#right_data_move_costs td:last-child,
+#right_data_resistances td:last-child {
+    padding-right: 0;
+    text-align: right;
+    font-weight: bold;
+    color: var(--ink-soft);
+}
+
+#right_data_move_container:hover #right_data_move_costs,
+#right_data_hp_container:hover #right_data_resistances {
+    display: block;
+}
+
+#right_data_move_container {
+    clear: left;
+}
+
+/* ------------------------------ modal prompts ------------------------------ */
+
+/* both prompts are sized in JS, so the frame here is deliberately thin:
+   it is drawn outside the width JS asked for */
+#recruit-prompt,
+#attack-prompt {
+    box-sizing: content-box;
+    color: var(--parchment);
+    background-color: var(--stone-dark);
+    background-image:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.045) 0 1px, rgba(0, 0, 0, 0) 2px),
+        linear-gradient(170deg, #4c4740 0%, #35322b 55%, #24211c 100%);
+    background-size: 37px 41px, auto;
+    border: 2px solid var(--stone-light);
+    box-shadow: inset 0 0 0 1px var(--wood-darkest),
+                0 0 0 1px var(--wood-darkest),
+                0 0 0 5px var(--wood),
+                0 0 0 6px var(--wood-darkest),
+                0 14px 34px rgba(0, 0, 0, 0.7);
+}
+
+/* recruit / advancement list */
+
+/* the prompt is a column (list+stats row, then the cancel strip) so the strip
+   can never hang below the frame; jQuery's show() drops the inline display:none
+   and lets this rule take over */
+#recruit-prompt {
+    display: flex;
+    flex-direction: column;
+}
+
+#recruit-body {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#recruit-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 3px;
+    box-sizing: border-box;
 }
 
 div.recruit-item {
-    margin-bottom: 2px;
-    background-color: #CCC;
+    position: relative;
+    margin-bottom: 3px;
     height: 72px;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--parchment);
+    cursor: pointer;
+    background-color: var(--wood-dark);
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, var(--wood) 0%, var(--wood-dark) 70%, var(--wood-darkest) 100%);
+    border: 1px solid var(--wood-darkest);
+    border-top-color: var(--wood-light);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+div.recruit-item:hover {
+    box-shadow: inset 0 0 0 1px rgba(240, 212, 119, 0.45),
+                0 0 12px rgba(195, 155, 40, 0.25);
 }
 
 div.recruit-item .img-wrapper {
     float: left;
+    background-color: rgba(0, 0, 0, 0.3);
+    box-shadow: inset -1px 0 0 rgba(240, 212, 119, 0.18);
 }
 
 div.img-wrapper {
@@ -103,173 +654,407 @@ div.img-wrapper {
 }
 
 div.recruit-item.selected {
-    background-color: #CCF;
+    color: #fff6da;
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #8a6820 0%, #5d4413 65%, #3a290a 100%);
+    box-shadow: inset 0 0 0 1px var(--gold-light),
+                0 0 16px rgba(195, 155, 40, 0.45);
+}
+
+/* the unit name is the first line of each row's text block */
+div.recruit-item span:first-child {
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    color: var(--gold-light);
+}
+
+div.recruit-item.selected span:first-child {
+    color: #fff6da;
+}
+
+/* the cost sits on the second line of the text block */
+div.recruit-item br + span {
+    font-size: 12px;
+    color: var(--gold);
+}
+
+div.recruit-item.selected br + span {
+    color: var(--parchment);
+}
+
+#recruit-stats {
+    flex: 0 0 130px;
+    box-sizing: border-box;
+    padding: 4px 10px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: var(--ink);
+    background-color: var(--parchment);
+    background-image: var(--parchment-face);
+    border-left: 2px solid var(--wood-darkest);
+    box-shadow: inset 0 0 26px rgba(120, 92, 46, 0.32);
+}
+
+#recruit-stats .img-wrapper {
+    margin: 8px auto 8px auto;
+    background-color: rgba(120, 92, 46, 0.18);
+    box-shadow: inset 0 0 0 1px var(--parchment-edge);
+}
+
+#recruit-stats span {
+    font-weight: bold;
+    color: var(--ink-soft);
+}
+
+#recruit-stats-attacks {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(120, 92, 46, 0.4);
+}
+
+#recruit-stats-attacks > div:nth-child(2n+1) {
+    margin-top: 3px;
+    font-family: var(--font-display);
+    color: #6b3d12;
+}
+
+#recruit-cancel {
+    flex: 0 0 auto;
+    padding: 6px;
+    text-align: center;
+    background-image: var(--grain-h), var(--wood-face);
+    border-top: 2px solid var(--wood-darkest);
+}
+
+/* the advancement prompt has no cancel button: no button, no strip */
+#recruit-cancel:empty {
+    display: none;
+}
+
+#recruit-cancel button {
+    padding: 5px 18px;
+    font-size: 12px;
+}
+
+/* attack prompt */
+
+/* JS gives the prompt a fixed height from the attack count; laying it out as a
+   column keeps the cancel strip pinned to the bottom edge of the frame rather
+   than leaving bare stone under it */
+#attack-prompt {
+    display: flex;
+    flex-direction: column;
 }
 
 #attack-combatants {
-    padding: 7px;
+    padding: 8px;
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0));
 }
 
-#attack-cancel {
-    text-align: center;
+#attack-combatants .img-wrapper {
+    background-color: rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 0 1px var(--wood-darkest),
+                0 0 0 3px var(--iron),
+                0 0 0 4px var(--wood-darkest);
 }
 
-#attack-cancel button {
-    margin: 5px;
-    color: white;
-    background-color: #55F;
-    font-size: 12pt;
+#attack-combatants .combatant-stats {
+    margin: 0 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+#attack-combatants .combatant-name {
+    font-family: var(--font-display);
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    color: var(--gold-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+#attack-resistances {
+    clear: both;
+    padding: 5px 8px 8px 8px;
+    overflow: hidden;
+    font-size: 11px;
+    color: var(--parchment-shade);
+}
+
+#attack-resistances .combatant-resistances {
+    max-width: 46%;
+}
+
+#attack-resistances .resistance {
+    display: inline-block;
+    margin-right: 7px;
+    white-space: nowrap;
 }
 
 #attack-list {
     width: 100%;
+    border-collapse: collapse;
 }
 
 .attack-item {
-    text-align:center;
-    padding: 3px;
-    margin: 2px;
-    background-color: #555;
-    height: 60px;
-    color: #FFF;
+    text-align: center;
+    height: 78px;
+    color: var(--parchment);
     cursor: pointer;
+    background-color: var(--iron);
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #4a453a 0%, var(--iron) 60%, #201d17 100%);
+}
+
+.attack-item > td {
+    padding: 3px;
+    border-top: 1px solid rgba(240, 212, 119, 0.14);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.attack-item:hover {
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #5b5446 0%, #454033 60%, #2a261e 100%);
 }
 
 .attack-item.selected {
-    background-color: #66D;
+    color: #fff6da;
+    background-image: var(--grain-h),
+                      linear-gradient(180deg, #8a6820 0%, #5d4413 65%, #3a290a 100%);
+}
+
+.attack-item.selected > td {
+    border-top-color: var(--gold-light);
+    border-bottom-color: var(--gold-dim);
+}
+
+.attack-item .attack-stats {
+    line-height: 1.45;
+    font-size: 12px;
+}
+
+.attack-item .attack-name {
+    font-family: var(--font-display);
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: var(--gold-light);
+}
+
+.attack-item.selected .attack-name {
+    color: #fff6da;
+}
+
+.attack-item .attack-detail {
+    color: var(--parchment-shade);
+}
+
+.attack-item .attack-properties {
+    font-style: italic;
+    color: #9fd0ff;
+}
+
+.attack-item .no-attack {
+    color: var(--stone-light);
+    font-style: italic;
+}
+
+.attack-item .attack-type {
+    font-family: var(--font-display);
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+}
+
+#attack-cancel {
+    margin-top: auto;
+    text-align: center;
+    padding: 6px;
+    background-image: var(--grain-h), var(--wood-face);
+    border-top: 2px solid var(--wood-darkest);
+}
+
+#attack-cancel button {
+    margin: 2px;
+    padding: 6px 22px;
+    font-size: 13px;
 }
 
 .translucent {
-    filter:alpha(opacity=60); 
-    -moz-opacity: 0.6; 
-    opacity: 0.6; 
+    filter: alpha(opacity=60);
+    -moz-opacity: 0.6;
+    opacity: 0.6;
 }
+
+/* ------------------------------ loading screen ------------------------------ */
 
 #loading-overlay {
     position: absolute;
     width: 100%;
     height: 100%;
-    color: #FFF;
-    background-color: #000;
+    color: var(--parchment);
+    background-color: var(--wood-darkest);
+    background-image:
+        radial-gradient(ellipse at 50% 30%, rgba(88, 62, 30, 0.55), rgba(10, 7, 3, 0.95) 72%),
+        var(--grain-v);
     text-align: center;
-    font-size: 20pt;
+    font-family: var(--font-body);
+    font-size: 15pt;
     z-index: 100;
 }
 
 #loading-overlay > div {
-    padding-top: 50px;
+    padding-top: 12vh;
 }
 
 #loading-overlay .big {
-    font-size: 40px;
+    font-family: var(--font-display);
+    font-size: 44px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.9),
+                 0 0 26px rgba(195, 155, 40, 0.4);
 }
 
-#loading-overlay progress {
-    margin: 10px auto;
-    width: 400px;
+/* gold rule beneath the title, echoing the map's hex grid */
+#loading-overlay .big::after {
+    content: "";
+    display: block;
+    width: 320px;
+    height: 2px;
+    margin: 14px auto 0 auto;
+    background: linear-gradient(90deg, rgba(195, 155, 40, 0) 0%, var(--gold) 50%, rgba(195, 155, 40, 0) 100%);
 }
 
 #loading-overlay #load-text {
-    margin-top: 20px;
+    margin-top: 18px;
+    font-style: italic;
+    color: var(--parchment-shade);
+}
+
+#loading-overlay progress {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: block;
+    margin: 16px auto;
+    width: 400px;
+    height: 16px;
+    background-color: var(--iron-dark);
+    border: 2px solid var(--wood-dark);
+    border-radius: 2px;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+#loading-overlay progress::-webkit-progress-bar {
+    background-color: var(--iron-dark);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+#loading-overlay progress::-webkit-progress-value {
+    background-image: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 55%, var(--gold-dim) 100%);
+    box-shadow: 0 0 10px rgba(195, 155, 40, 0.6);
+}
+
+#loading-overlay progress::-moz-progress-bar {
+    background-image: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 55%, var(--gold-dim) 100%);
 }
 
 .small-load-text {
+    max-width: 460px;
+    margin: 0 auto;
     font-size: 10pt;
+    color: var(--stone-light);
 }
 
-#right_data_move_costs {
-    display: none;
-    position: absolute;
-    z-index: 99;
-    left: -140px;
-    background-color: rgba(33, 33, 33, 0.6);
-    color: #FFF;
-    top: 0;
-}
+/* --------------------------- info overlays (parchment) --------------------------- */
 
-#right_data_move_container:hover #right_data_move_costs {
-    display: block;
-}
-
-#right_data_move_container {
-    clear: left;
-}
-
-#right_data_resistances {
-    display: none;
-    position: absolute;
-    z-index: 99;
-    left: -120px;
-    background-color: rgba(33, 33, 33, 0.6);
-    color: #FFF;
-    top: 130px;
-}
-
-#right_data_hp_container:hover #right_data_resistances {
-    display: block;
-}
-
-#top-menu-button {
-    background-color: blue;
-    border: thin solid #77F;
-    color: white;
-    cursor: pointer;
-    font-size: 12pt;
-}
-
-#top-menu-list {
-    height:204px;
-    width:150px;
-    position: absolute;
-    top: 30px;
-    background-color: blue;
-    color: white;
-    display: none;
-}
-
-.top-menu-item {
-    height: 18px;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 7px;
-}
-
-.top-menu-item:hover {
-    background-color: #55F;
-}
-
-#animation-speed-menu {
-    position: absolute;
-    left: 150px;
-    top: 34px;
-    background-color: blue;
-    display: none;
-}
-
-#top-menu-animation-speed-group:hover #animation-speed-menu {
-    display: block;
-}
-
-#top-menu-sound {
-    color: gray;
-}
-
-#top-menu-sound:hover {
-    background-color: inherit;
-}
-
-#player-overlay {
+#player-overlay,
+#credits-overlay {
+    box-sizing: border-box;
     width: 600px;
-    padding: 10px;
-    background-color: #999;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 18px 22px;
     position: absolute;
+    top: 60px;
+    z-index: 200;
     display: none;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink);
+    background-color: var(--parchment);
+    background-image:
+        radial-gradient(circle at 12% 16%, rgba(120, 92, 46, 0.12) 0 18%, rgba(0, 0, 0, 0) 19%),
+        radial-gradient(circle at 82% 74%, rgba(120, 92, 46, 0.10) 0 22%, rgba(0, 0, 0, 0) 23%),
+        var(--parchment-face);
+    border: 2px solid var(--parchment-edge);
+    box-shadow: inset 0 0 34px rgba(120, 92, 46, 0.3),
+                0 0 0 1px var(--wood-darkest),
+                0 0 0 6px var(--wood),
+                0 0 0 7px var(--wood-darkest),
+                0 16px 38px rgba(0, 0, 0, 0.7);
+}
+
+#player-overlay table {
+    width: 100%;
+    margin-bottom: 14px;
+    border-collapse: collapse;
+}
+
+#player-overlay tr:first-child td {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b3d12;
+    border-bottom: 2px solid var(--parchment-edge);
+}
+
+#player-overlay td {
+    padding: 5px 8px;
+    border-bottom: 1px solid rgba(120, 92, 46, 0.3);
+}
+
+#player-overlay a,
+#credits-overlay a {
+    color: #7a3d12;
+}
+
+#player-overlay button,
+#credits-overlay button {
+    padding: 7px 20px;
+    font-size: 13px;
 }
 
 #credits-overlay {
-    width: 600px;
-    padding: 10px;
-    background-color: #999;
-    position: absolute;
-    display: none;
+    font-size: 12px;
+}
+
+#credits-overlay ul {
+    margin: 6px 0 12px 0;
+    padding-left: 22px;
+}
+
+/* parchment-and-iron scrollbars inside the overlays and the recruit list */
+#recruit-list::-webkit-scrollbar,
+#player-overlay::-webkit-scrollbar,
+#credits-overlay::-webkit-scrollbar {
+    width: 11px;
+}
+
+#recruit-list::-webkit-scrollbar-track,
+#player-overlay::-webkit-scrollbar-track,
+#credits-overlay::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+#recruit-list::-webkit-scrollbar-thumb,
+#player-overlay::-webkit-scrollbar-thumb,
+#credits-overlay::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, var(--wood-light), var(--wood-dark));
+    border: 1px solid var(--wood-darkest);
 }

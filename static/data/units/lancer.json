@@ -1,0 +1,101 @@
+{
+  "name": "Lancer",
+  "img": "/data/img/units/lancer.png",
+  "cost": 47,
+  "maxHp": 50,
+  "move": 10,
+  "maxXp": 100,
+  "level": 2,
+  "alignment": "lawful",
+  "attacks": [
+    {
+      "name": "Lance",
+      "type": "melee",
+      "damageType": "pierce",
+      "damage": 12,
+      "number": 3,
+      "properties": [
+        "charge"
+      ],
+      "animation": [
+        1,
+        5
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "reef": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 3,
+      "cover": 1.7
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 4,
+      "cover": 1.8
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 4,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": -0.2,
+    "impact": 0.3,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/lancer-sprite.png"
+}

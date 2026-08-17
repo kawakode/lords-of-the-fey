@@ -17,19 +17,27 @@
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
 module.exports.initListing = function(app, collections) {
-    app.get("/gamelist", function(req, res) {
+    app.get("/gamelist", async function(req, res) {
         var user = req.user;
         if(!user) { res.redirect("/"); return; }
-        collections.games.find({ players: { $elemMatch: { username: user.username} } }, function(err, games) {
-            games.toArray(function(err, gameArray) {
-                gameArray.forEach(function(elm) {
-                    if(user.username == elm.players[elm.activeTeam-1].username) {
-                        elm.isYourTurn = true;
-                    }
-                });
-                gameArray.sort(function(a,b) { return !!b.isYourTurn - !!a.isYourTurn });
-                res.render("gamelist.hbs", { games: gameArray, username: user.username });
-            });
+        var gameArray = await collections.games.find({ players: { $elemMatch: { username: user.username} } }).toArray();
+        gameArray.forEach(function(elm) {
+            if(elm.over) {
+                // a finished game has no active player, only a result
+                var you = elm.players.filter(function(p) { return p.username == user.username; })[0];
+                elm.isFinished = true;
+                elm.youWon = !!you && you.alliance == elm.winner;
+                return;
+            }
+
+            if(user.username == elm.players[elm.activeTeam-1].username) {
+                elm.isYourTurn = true;
+            }
         });
+        // your turn first, then ongoing games, then finished ones
+        gameArray.sort(function(a,b) {
+            return (!!a.isFinished - !!b.isFinished) || (!!b.isYourTurn - !!a.isYourTurn);
+        });
+        res.render("gamelist.hbs", { games: gameArray, username: user.username });
     });
 }

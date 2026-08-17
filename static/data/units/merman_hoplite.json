@@ -1,0 +1,101 @@
+{
+  "name": "Merman Hoplite",
+  "img": "/data/img/units/merman_hoplite.png",
+  "cost": 44,
+  "maxHp": 58,
+  "move": 5,
+  "maxXp": 150,
+  "level": 3,
+  "alignment": "lawful",
+  "fixedAttributes": [
+    "steadfast"
+  ],
+  "attacks": [
+    {
+      "name": "Spear",
+      "type": "melee",
+      "damageType": "pierce",
+      "damage": 15,
+      "number": 2,
+      "animation": [
+        1,
+        3
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.7
+    },
+    "deep_water": {
+      "move": 1,
+      "cover": 0.5
+    },
+    "flat": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 4,
+      "cover": 0.3
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 4,
+      "cover": 0.3
+    },
+    "mountains": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.2,
+    "pierce": 0.3,
+    "impact": 0.2,
+    "fire": 0.2,
+    "cold": 0.3,
+    "arcane": 0.0
+  },
+  "sprite": "/data/img/units/merman_hoplite-sprite.png"
+}

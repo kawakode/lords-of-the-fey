@@ -1,0 +1,114 @@
+{
+  "name": "Trapper",
+  "img": "/data/img/units/trapper.png",
+  "cost": 21,
+  "maxHp": 49,
+  "move": 5,
+  "maxXp": 73,
+  "level": 2,
+  "alignment": "chaotic",
+  "advancesTo": [
+    "huntsman",
+    "ranger"
+  ],
+  "attacks": [
+    {
+      "name": "Dagger",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 5,
+      "number": 4,
+      "icon": "/data/img/attacks/dagger-human.png",
+      "animation": [
+        1,
+        3
+      ]
+    },
+    {
+      "name": "Bow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "damage": 6,
+      "number": 4,
+      "animation": [
+        4,
+        12
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.0,
+    "pierce": 0.0,
+    "impact": 0.0,
+    "fire": 0.0,
+    "cold": 0.0,
+    "arcane": 0.1
+  },
+  "sprite": "/data/img/units/trapper-sprite.png"
+}

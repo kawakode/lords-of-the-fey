@@ -16,51 +16,100 @@
     You should have received a copy of the GNU Affero General Public License
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
-#top-main-menu {
-  postion: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height: 40px;
-  background-color: black;
-  color: white;
-  font-family: sans-serif;
-}
 
-#top-main-menu a {
-  color: white;
-}
-
-#top-main-menu div {
-  padding: 8px 15px;
-}
-
-.main-content a.option {
-    color: #fff;
-    font-size: 16pt;
-    padding: 15px 0;
-    display: block;
-}
-
-div.option {
-    max-width: 650px;
-    margin: 3px auto;
-    background-color: #000;
-}
+/* Front page / shared menu layout. Visual language lives in theme.css. */
 
 .main-content {
-    font-size: 19pt;
-    font-family: sans-serif;
+    font-family: var(--font-body);
+    font-size: 16px;
+    text-align: center;
 }
 
-.main-content > div {
-  margin-bottom: 10px;
+.main-content a {
+    color: var(--gold-light);
 }
 
-.main-content > div a {
-    color: #227;
+.fey-hero {
+    padding-top: 8px;
+    text-align: center;
 }
 
-h1 {
-    margin: 20px 0 25px 0;
+/* stone hex crest with a gold hex inlay, straight from the map grid */
+.fey-crest {
+    position: relative;
+    display: block;
+    width: 76px;
+    height: 86px;
+    margin: 10px auto 2px auto;
+    background-image:
+        linear-gradient(165deg, var(--stone-light) 0%, var(--stone) 45%, var(--stone-dark) 100%);
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65));
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.fey-crest::before,
+.fey-crest::after {
+    content: "";
+    position: absolute;
+    -webkit-clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.fey-crest::before {
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    background-image: linear-gradient(165deg, var(--wood-light) 0%, var(--wood-dark) 100%);
+}
+
+.fey-crest::after {
+    top: 24px; left: 24px; right: 24px; bottom: 24px;
+    background-image: linear-gradient(165deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dim) 100%);
+}
+
+.fey-blurb {
+    max-width: 640px;
+    margin: 0 auto 26px auto;
+    line-height: 1.6;
+}
+
+.fey-menu {
+    max-width: 560px;
+    margin: 0 auto 30px auto;
+    padding: 18px;
+}
+
+.fey-footnotes {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--parchment-shade);
+    text-align: left;
+    background: rgba(12, 8, 4, 0.55);
+    border: 1px solid var(--stone);
+    border-radius: 3px;
+}
+
+.fey-footnotes p {
+    margin: 0 0 8px 0;
+}
+
+.fey-footnotes p:last-child {
+    margin-bottom: 0;
+}
+
+.fey-tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 7px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    vertical-align: middle;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--stone-light);
+    border-radius: 2px;
 }

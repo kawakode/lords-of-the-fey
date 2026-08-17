@@ -16,47 +16,46 @@
     You should have received a copy of the GNU Affero General Public License
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
-exports.checkForVictory = function checkForVictory(game, collections, callback) {
+exports.checkForVictory = async function checkForVictory(game, collections, callback) {
     var result = { victory: false };
     var teamsWithCommanders = {};
-    collections.units.find({ gameId: game._id, isCommander: true }, function(err, cursor) {
-        cursor.toArray(function (err, commanderList) {
-            commanderList.forEach(function(commander) {
-                teamsWithCommanders[commander.team] = true;
-            });
+    var commanderList = await collections.units.find({ gameId: game._id, isCommander: true }).toArray();
 
-            var winningAlliance = null;
-            var survivingTeamList = Object.getOwnPropertyNames(teamsWithCommanders);
-            console.log(survivingTeamList);
-            for(var i=0; i < survivingTeamList.length; ++i) {
-                var team = survivingTeamList[i];
-                var thisAlliance = game.players[team-1].alliance;
-                if(winningAlliance == null) { winningAlliance = thisAlliance }
-                if(thisAlliance != winningAlliance) {
-                    winningAlliance = null;
-                    break;
-                }
-            }
+    commanderList.forEach(function(commander) {
+        teamsWithCommanders[commander.team] = true;
+    });
 
-            if(winningAlliance !== null) {
-                result.victory = true;
-                result.alliance = winningAlliance;
-            }
+    var winningAlliance = null;
+    var survivingTeamList = Object.getOwnPropertyNames(teamsWithCommanders);
 
-            callback(result);
-        });
-    });        
+    // every commander died in the same combat: nobody can win, so the game is a draw
+    if(survivingTeamList.length == 0) {
+        callback({ victory: true, draw: true, alliance: null });
+        return;
+    }
+
+    for(var i=0; i < survivingTeamList.length; ++i) {
+        var team = survivingTeamList[i];
+        var thisAlliance = game.players[team-1].alliance;
+        if(winningAlliance == null) { winningAlliance = thisAlliance }
+        if(thisAlliance != winningAlliance) {
+            winningAlliance = null;
+            break;
+        }
+    }
+
+    if(winningAlliance !== null) {
+        result.victory = true;
+        result.alliance = winningAlliance;
+    }
+
+    callback(result);
 }
 
-exports.concludeGame = function(result, game, collections, callback) {
+exports.concludeGame = async function(result, game, collections, callback) {
     game.over = true;
     game.winner = result.alliance;
-    collections.units.find({ gameId: game._id.toString() }, function(unitCursor) {
-        unitCursor.next(function stripGameId(u) {
-            if(!u) { collections.units.save(unitCursor); }
-            else {
-                delete u.gameId;
-            }
-        });
-    });
+    await collections.games.replaceOne({ _id: game._id }, game);
+    await collections.units.updateMany({ gameId: game._id }, { $unset: { gameId: "" } });
+    if(callback) { callback(); }
 }

@@ -1,0 +1,110 @@
+{
+  "name": "Fire Drake",
+  "img": "/data/img/units/fire_drake.png",
+  "cost": 35,
+  "maxHp": 63,
+  "move": 5,
+  "maxXp": 84,
+  "level": 2,
+  "alignment": "lawful",
+  "advancesTo": [
+    "inferno_drake"
+  ],
+  "attacks": [
+    {
+      "name": "Battle claws",
+      "type": "melee",
+      "damageType": "blade",
+      "damage": 9,
+      "number": 2,
+      "icon": "/data/img/attacks/claws-drake.png",
+      "animation": [
+        1,
+        6
+      ]
+    },
+    {
+      "name": "Fire breath",
+      "type": "ranged",
+      "damageType": "fire",
+      "damage": 7,
+      "number": 5,
+      "icon": "/data/img/attacks/fire-breath-drake.png"
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "cave": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "reef": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "hills": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "mountains": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "sand": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "shallow_water": {
+      "move": 1,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 1,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": -0.1,
+    "impact": 0.2,
+    "fire": 0.6,
+    "cold": -0.4,
+    "arcane": -0.2
+  },
+  "sprite": "/data/img/units/fire_drake-sprite.png"
+}

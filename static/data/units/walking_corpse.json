@@ -1,0 +1,107 @@
+{
+  "name": "Walking Corpse",
+  "img": "/data/img/units/walking_corpse.png",
+  "cost": 8,
+  "maxHp": 18,
+  "move": 4,
+  "maxXp": 24,
+  "level": 0,
+  "alignment": "chaotic",
+  "fixedAttributes": [
+    "undead"
+  ],
+  "attributeCount": 1,
+  "omittedAttributes": [
+    "intelligent"
+  ],
+  "advancesTo": [
+    "soulless"
+  ],
+  "attacks": [
+    {
+      "name": "Touch",
+      "type": "melee",
+      "damageType": "impact",
+      "damage": 6,
+      "number": 2,
+      "icon": "/data/img/attacks/touch-zombie.png",
+      "properties": [
+        "plague"
+      ]
+    }
+  ],
+  "terrain": {
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 2,
+      "cover": 0.4
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "deep_water": {
+      "move": 3,
+      "cover": 0.1
+    },
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "forest": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.6
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "shallow_water": {
+      "move": 2,
+      "cover": 0.2
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
+  },
+  "resistances": {
+    "blade": 0.1,
+    "pierce": 0.3,
+    "impact": -0.1,
+    "fire": -0.2,
+    "cold": 0.6,
+    "arcane": -0.2
+  }
+}

@@ -7,51 +7,113 @@
   "maxHp": 29,
   "maxXp": 44,
   "terrain": {
-    "flat": { "move":1, "cover":0.4 },
-    "swamp": { "move":2, "cover":0.3 },
-    "castle": { "move":1, "cover":0.6 },
-    "forest": { "move":1, "cover":0.7 },
-    "village": { "move":1, "cover":0.6 },
-    "deep_water": { "move":-1, "cover":0 },
-    "shallow_water": { "move":3, "cover":0.2 },
-    "reef":{ "move":2, "cover":0.3 },
-    "sand":{ "move":2, "cover":0.3 },
-    "hills": { "move":2, "cover":0.5 },
-    "mountains":{ "move":3, "cover":0.6 },
-    "cave":{ "move":3, "cover":0.3 },
-    "frozen": { "move":2, "cover":0.3 },
-    "unwalkable":{ "move":-1, "cover":0 },
-    "fungus":{ "move":2, "cover":0.5 },
-    "impassable": { "move":-1, "cover":0 }
+    "flat": {
+      "move": 1,
+      "cover": 0.4
+    },
+    "swamp": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "castle": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "forest": {
+      "move": 1,
+      "cover": 0.7
+    },
+    "village": {
+      "move": 1,
+      "cover": 0.6
+    },
+    "deep_water": {
+      "move": -1,
+      "cover": 0
+    },
+    "shallow_water": {
+      "move": 3,
+      "cover": 0.2
+    },
+    "reef": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "sand": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "hills": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "mountains": {
+      "move": 3,
+      "cover": 0.6
+    },
+    "cave": {
+      "move": 3,
+      "cover": 0.3
+    },
+    "frozen": {
+      "move": 2,
+      "cover": 0.3
+    },
+    "unwalkable": {
+      "move": -1,
+      "cover": 0
+    },
+    "fungus": {
+      "move": 2,
+      "cover": 0.5
+    },
+    "impassable": {
+      "move": -1,
+      "cover": 0
+    }
   },
-  "attributePool": ["dextrous"],
+  "attributePool": [
+    "dextrous"
+  ],
   "attributeCount": 2,
-  "attacks":[
+  "attacks": [
     {
-      "name":"Sword",
-      "type":"melee",
-      "damageType":"blade",
-      "number":2,
-      "damage":5,
-      "icon": "/data/img/attacks/sword-elven.png"
+      "name": "Sword",
+      "type": "melee",
+      "damageType": "blade",
+      "number": 2,
+      "damage": 5,
+      "icon": "/data/img/attacks/sword-elven.png",
+      "animation": [
+        1,
+        6
+      ]
     },
     {
-      "name":"Bow",
-      "type":"ranged",
-      "damageType":"pierce",
-      "number":4,
-      "damage":5,
-      "img": { "n":"/data/img/projectiles/missile-n.png", "ne":"/data/img/projectiles/missile-ne.png" },
-      "icon": "/data/img/attacks/bow-elven.png"
+      "name": "Bow",
+      "type": "ranged",
+      "damageType": "pierce",
+      "number": 4,
+      "damage": 5,
+      "img": {
+        "n": "/data/img/projectiles/missile-n.png",
+        "ne": "/data/img/projectiles/missile-ne.png"
+      },
+      "icon": "/data/img/attacks/bow-elven.png",
+      "animation": [
+        7,
+        12
+      ]
     }
   ],
   "resistances": {
-    "arcane":-0.1,
-    "blade":  0.0,
-    "cold":   0.0,
-    "fire":   0.0,
+    "arcane": -0.1,
+    "blade": 0.0,
+    "cold": 0.0,
+    "fire": 0.0,
     "impact": 0.0,
     "pierce": 0.0
   },
-  "alignment":"neutral"
+  "alignment": "neutral",
+  "sprite": "/data/img/units/elvish_archer-sprite.png"
 }
