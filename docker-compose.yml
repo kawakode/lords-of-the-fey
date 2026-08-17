@@ -13,8 +13,8 @@ services:
       retries: 10
       start_period: 30s
 
-  app:
-    build: .
+  lotf:
+    image: ghcr.io/kawakode/lords-of-the-fey:latest
     container_name: lotf-app
     depends_on:
       mongodb:
