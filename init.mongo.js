@@ -18,14 +18,19 @@
 // run this script inside mongodb:
 //  mongosh < init.mongo.js
 // (or paste in mongosh)
+//
+// This script only prepares indexes. It used to seed two accounts ("hello" and
+// "goodbye") whose password was the literal string "world"; because
+// docker-compose runs this file on first start, every deployment shipped with
+// known credentials (OWASP A07: identification and authentication failures).
+// Create accounts through /signup instead.
 
 // Switch to lotf database
 use('lotf');
 
-// Clear existing users collection if it exists
-db.users.deleteMany({});
+// usernames are the identity passport serializes, so they must be unique
+db.users.createIndex({ username: 1 }, { unique: true });
 
-// Create test users - password for each account is "world"
-db.users.insertOne({ "username" : "hello", "hash" : "sha1$b622db74$1$24bfe8583b3256bcd69664badb022f6542d81b1c" });
-db.users.insertOne({ "username" : "goodbye", "hash" : "sha1$f2717d97$1$b753e89521086d6e026af2c1bc6f3ad3dc932bb9" });
-
+// the collections the server queries by these fields
+db.units.createIndex({ gameId: 1 });
+db.games.createIndex({ "players.username": 1 });

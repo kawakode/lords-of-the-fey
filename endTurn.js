@@ -1,14 +1,20 @@
 var socketOwnerCanAct = require("./auth").socketOwnerCanAct;
 var loadMap = require("./loadUtils").loadMap;
 var Unit = require("./static/shared/unit.js").Unit;
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
+var ObjectID = function(input) { if(!/^[0-9a-fA-F]{24}$/.test(input)) { return; } return new (require('mongodb').ObjectId)(input); }
 var unitLib = require("./static/shared/unit.js").unitLib;
 var Terrain = require("./static/shared/terrain.js").Terrain;
 var resumePlannedMoves = require("./executePath").resumePlannedMoves;
+var security = require("./security");
 
 module.exports = function(collections, data, socket, socketList) {
-    var gameId = ObjectID(data.gameId);
-        collections.games.findOne({_id:gameId}).then(function(game) {
+    data = data || {};
+
+    var gameIdString = security.asObjectIdString(data.gameId);
+    if(!gameIdString) { socket.emit("no game"); return; }
+    var gameId = ObjectID(gameIdString);
+
+        return collections.games.findOne({_id:gameId}).then(function(game) {
             if(!game) { socket.emit("no game"); return; }
 
             if(!socketOwnerCanAct(socket, game)) {
@@ -16,10 +22,14 @@ module.exports = function(collections, data, socket, socketList) {
             }
 
             var oldActiveTeam = game.activeTeam;
+            // bounded so a game whose player list holds nothing but empty slots
+            // cannot spin here forever
+            var attempts = 0;
             do {
                 game.activeTeam %= (game.players.length);
                 game.activeTeam++;
-            } while(!game.players[game.activeTeam - 1].username);
+            } while(!(game.players[game.activeTeam - 1] || {}).username && ++attempts <= game.players.length);
+            if(!(game.players[game.activeTeam - 1] || {}).username) { return; }
 
             var villageCount = 0;
             for(var coords in game.villages) {
@@ -107,6 +117,8 @@ module.exports = function(collections, data, socket, socketList) {
                     };
                     
                     loadMap(game.map, function(err, mapData) {
+                        if(err || !mapData) { console.error("endTurn: could not load map", game.map, err); return; }
+
                         unitList.forEach(function updateUnitForNewTurn(unit) {
                             var update = updates[unit.x+","+unit.y] || {};
                             var healedHp = update.healedHp || 0;
@@ -152,8 +164,9 @@ module.exports = function(collections, data, socket, socketList) {
                                     healedHp = 8;
                                 }
                             }
-                            if(mapData[unit.x+","+unit.y].terrain.properties.indexOf("village") != -1 || 
-                               unit.attributes.indexOf("regenerates") != -1){
+                            var unitSpace = mapData[unit.x+","+unit.y] || { terrain: { properties: [] } };
+                            if(unitSpace.terrain.properties.indexOf("village") != -1 ||
+                               (unit.attributes || []).indexOf("regenerates") != -1){
                                 villageHeal();
                             }
 

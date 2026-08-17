@@ -35,7 +35,8 @@ socket.emit("enter room", roomId);
 socket.on("room data", function(data) {
     if(data.room == undefined) {
         window.removeEventListener("beforeunload", confirmLeave);
-        window.location.href = "/lobby"
+        window.location.href = "/lobby";
+        return;
     }
 
     players = data.room.players;

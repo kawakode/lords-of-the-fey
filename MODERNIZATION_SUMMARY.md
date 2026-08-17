@@ -3,6 +3,39 @@
 ## Overview
 Upgraded Lords of the Fey from legacy Node.js stack (2014-2015) to modern libraries with full Docker support.
 
+---
+
+## Second upgrade pass (2026-08-17)
+
+Every runtime dependency is now on its latest published major.
+
+| Package | Before | After | Code impact |
+| --- | --- | --- | --- |
+| express | 4.22 | 5.2 | `express.static.mime` no longer exists (serve-static v2); custom MIME types are now applied through the `setHeaders` option in `server.js` |
+| body-parser | 1.20 | *removed* | Replaced by the built-in `express.urlencoded()` / `express.json()` |
+| mongodb | 6.21 | 7.5 | `new ObjectId()` no longer accepts 12-character strings, so the `ObjectID()` guard in `server.js`, `createUnit.js`, `endTurn.js`, `executePath.js` and `levelUp.js` now validates a 24-character hex string |
+| connect-mongo | 5.1 | 6.0 | The package is now dual ESM/CJS and no longer exports the class as the module root: `require('connect-mongo').MongoStore` |
+| passport-google-oauth | 2.0 (deprecated) | passport-google-oauth20 2.0 | `.Strategy` instead of `.OAuth2Strategy`; the dead `plus.login` scope was replaced with `profile` |
+| express-session | 1.17 | 1.19 | none |
+| cookie-parser | 1.4.6 | 1.4.7 | none |
+| socket.io | 4.7 | 4.8 | none |
+| hbs | 4.2.0 | 4.2.1 | none |
+| jQuery (vendored) | 2.0.3 | 3.7.1 | none; no removed jQuery 3 API is used by the client |
+
+Also bumped: `engines.node` to `>=20.19.0` (required by mongodb 7 and connect-mongo 6), the Docker base image to `node:24-alpine` with `npm ci` against the lockfile, and the Compose MongoDB service to `mongo:8.0`.
+
+EaselJS and PreloadJS are already on 1.0.0, which is the final CreateJS release.
+
+### Verified end to end
+Signup, login, logout, session persistence, socket.io authentication, lobby, room creation, game launch, `initdata` and unit movement were all exercised against the Docker stack, plus a browser pass over the lobby and the canvas client (no console errors).
+
+### Known remaining risks
+- `passport-twitter` 1.0.4 pulls in `xtraverse` → `xmldom`, which carries a critical advisory and has no fixed release. The package is unmaintained and the Twitter API it targets is retired. Removing the Twitter strategy is the only real fix.
+- `password-hash` 1.2.2 has been unmaintained since 2015 and defaults to salted SHA-1. Moving to bcrypt or argon2 requires a rehash-on-login migration because existing hashes cannot be converted.
+- `passport.socketio` 3.7.0 was last published in 2016. It still works against socket.io 4 and passport 0.7 (verified), but it has no upstream and depends on the deprecated `xtend`.
+
+---
+
 ## Files Modified
 
 ### 1. **package.json**

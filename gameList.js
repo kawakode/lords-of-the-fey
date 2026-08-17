@@ -17,9 +17,10 @@
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
 module.exports.initListing = function(app, collections) {
-    app.get("/gamelist", async function(req, res) {
+    app.get("/gamelist", async function(req, res, next) {
+      try {
         var user = req.user;
-        if(!user) { res.redirect("/"); return; }
+        if(!user || typeof user.username != "string") { res.redirect("/"); return; }
         var gameArray = await collections.games.find({ players: { $elemMatch: { username: user.username} } }).toArray();
         gameArray.forEach(function(elm) {
             if(elm.over) {
@@ -30,7 +31,8 @@ module.exports.initListing = function(app, collections) {
                 return;
             }
 
-            if(user.username == elm.players[elm.activeTeam-1].username) {
+            var activePlayer = (elm.players || [])[elm.activeTeam-1];
+            if(activePlayer && user.username == activePlayer.username) {
                 elm.isYourTurn = true;
             }
         });
@@ -38,6 +40,12 @@ module.exports.initListing = function(app, collections) {
         gameArray.sort(function(a,b) {
             return (!!a.isFinished - !!b.isFinished) || (!!b.isYourTurn - !!a.isYourTurn);
         });
+        // the stored player records carry anonymous-seat tokens; the list only needs
+        // names, so nothing else is handed to the template
+        gameArray.forEach(function(elm) {
+            elm.players = (elm.players || []).map(function(p) { return { username: p.username }; });
+        });
         res.render("gamelist.hbs", { games: gameArray, username: user.username });
+      } catch(err) { next(err); }
     });
 }

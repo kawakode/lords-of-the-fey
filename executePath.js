@@ -20,24 +20,45 @@
 /** @module executePath */
 
 var socketOwnerCanAct = require("./auth").socketOwnerCanAct;
+var socketPlayer = require("./auth").socketPlayer;
+var security = require("./security");
 var loadMap = require("./loadUtils").loadMap;
 var Unit = require("./static/shared/unit.js").Unit;
 var executeAttack = require("./executeAttack");
 var Terrain = require("./static/shared/terrain.js").Terrain;
 var executeAttack = require("./executeAttack");
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
+var ObjectID = function(input) { if(!/^[0-9a-fA-F]{24}$/.test(input)) { return; } return new (require('mongodb').ObjectId)(input); }
 var checkForVictory = require("./endGame").checkForVictory;
 var concludeGame = require("./endGame").concludeGame;
 
+/** longest path a client may order in one move (bounds the work per request) */
+var MAX_PATH_LENGTH = 256;
+
 module.exports = function(collections, data, socket, socketList) {
-        var gameId = ObjectID(data.gameId);
+        data = data || {};
+
+        // the path and the game id are used to build Mongo queries and to index the
+        // map, so they are validated before anything else happens (OWASP A03)
+        var gameIdString = security.asObjectIdString(data.gameId);
+        if(!gameIdString) { socket.emit("no game"); return; }
+        var gameId = ObjectID(gameIdString);
+
+        var path = security.asPath(data.path, MAX_PATH_LENGTH);
+        if(!path) { console.warn("move: rejected malformed path"); return; }
+
+        var attackIndex = (data.attackIndex == null) ? null : security.asInt(data.attackIndex, 0, 63);
+        if(data.attackIndex != null && attackIndex == null) { socket.emit("moved", { path:[path[0]] }); return; }
+
         collections.games.findOne({_id:gameId}).then(function(game) {
             if(!game) { socket.emit("no game"); return; }
 
             // a finished game accepts no further moves
-            if(game.over) { socket.emit("moved", { path:[data.path[0]] }); return; }
+            if(game.over) { socket.emit("moved", { path:[path[0]] }); return; }
 
-            performMove(collections, game, gameId, data.path, data.attackIndex, socketList, { socket: socket });
+            performMove(collections, game, gameId, path, attackIndex, socketList, { socket: socket });
+        }).catch(function(err) {
+            console.error("move failed:", err);
+            socket.emit("moved", { path:[path[0]] });
         });
 }
 
@@ -55,8 +76,11 @@ module.exports = function(collections, data, socket, socketList) {
 function performMove(collections, game, gameId, path, attackIndex, socketList, options, done) {
         options = options || {};
 
+        // a resumed plan replays an index that was stored on the unit, so it is
+        // re-checked here rather than trusted a second time round
+        attackIndex = (attackIndex == null) ? null : security.asInt(attackIndex, 0, 63);
+
         var socket = options.socket;
-        var user = socket && socket.request.user;
         var finished = false;
         var finish = function() { if(!finished) { finished = true; if(done) { done(); } } };
         var abort = function() {
@@ -65,13 +89,20 @@ function performMove(collections, game, gameId, path, attackIndex, socketList, o
         };
 
             loadMap(game.map, function(err, mapData) {
+                if(err || !mapData) { abort(); return; }
+
                 collections.units.findOne({ x:path[0].x, y:path[0].y, gameId:gameId }).then(function(unitRecord) {
                     if(!unitRecord) { abort(); return; }
 
-                    // ensure that the logged-in user has the right to move this unit
+                    // ensure that the logged-in user has the right to move this unit.
+                    // every one of these must hold: the caller has to be a player in
+                    // this game, it has to be their turn, and the unit has to be
+                    // theirs. (This test used to be an `&&` chain that passed for a
+                    // caller who was not in the game at all, which let any logged-in
+                    // user move any unit in any game.)
                     if(socket) {
-                        var player = game.players.filter(function(p) { return p.username == user.username })[0];
-                        if(!socketOwnerCanAct(socket, game) && player && player.team != unitRecord.team) {
+                        var player = socketPlayer(socket, game);
+                        if(!player || !socketOwnerCanAct(socket, game) || player.team != unitRecord.team) {
                             abort();
                             return;
                         }
@@ -150,7 +181,13 @@ function performMove(collections, game, gameId, path, attackIndex, socketList, o
                                         });
 
                                         moveResult.path = moveResult.publicPath || moveResult.path;
-                                        var unalliedPlayerSocketData = socketList.filter(function(o){ return alliedPlayerSocketData.indexOf(o)==-1; });
+                                        // only sockets watching *this* game hear about it: the
+                                        // unfiltered list broadcast every move (including the
+                                        // hidden-unit details of the allied payload's siblings)
+                                        // to every connected client in every game
+                                        var unalliedPlayerSocketData = socketList.filter(function(o){
+                                            return o.gameId.equals(gameId) && alliedPlayerSocketData.indexOf(o)==-1;
+                                        });
                                         unalliedPlayerSocketData.forEach(function(s) {
                                             s.socket.emit("moved", moveResult);
                                         });
@@ -162,8 +199,17 @@ function performMove(collections, game, gameId, path, attackIndex, socketList, o
                                         finish();
                                 };
 
+                                // an attack index the unit does not actually have would
+                                // index past its attack list; treat it as no attack
+                                var attackIsValid = moveResult.attack &&
+                                    Array.isArray(unit.attacks) &&
+                                    attackIndex != null &&
+                                    attackIndex < unit.attacks.length;
+
+                                if(moveResult.attack && !attackIsValid) { abort(); return; }
+
                                 // perform the attack
-                                if(moveResult.attack && !unit.hasAttacked) {
+                                if(attackIsValid && !unit.hasAttacked) {
                                     var targetCoords = path[path.length-1];
                                     collections.units.findOne({ x:targetCoords.x, y:targetCoords.y, gameId:gameId }).then(async function(defenderRecord) {
                                         if(!defenderRecord) {
@@ -264,7 +310,9 @@ module.exports.resumePlannedMoves = function(collections, gameId, game, team, so
     collections.units.find({ gameId: gameId, team: team, plannedPath: { $exists: true } }).toArray().then(async function(records) {
         for(var i=0; i<records.length; ++i) {
             var record = records[i];
-            var plan = record.plannedPath;
+            // the stored plan originally came from a client, so it is validated again
+            // on the way back out of the database
+            var plan = security.asPath(record.plannedPath, MAX_PATH_LENGTH);
 
             // a plan is only good while the unit still stands where it left off
             if(!plan || plan.length < 2 || plan[0].x != record.x || plan[0].y != record.y) {
@@ -319,6 +367,9 @@ function executePath(path, unit, unitArray, mapData, game) {
         var isLastSpace = (i == path.length-1);
 
         if(!areNeighbors(path[i], path[i-1])) { return { path:[path[0]], revealedUnits:[] }; }
+
+        // a step off the edge of the map has no terrain to cost or stand on
+        if(!mapData[coords.x+","+coords.y]) { return { path:[path[0]], revealedUnits:[] }; }
 
         var occupant = unitArray.filter(function(u) { return u.x == coords.x && u.y == coords.y; })[0];
         if(occupant) {

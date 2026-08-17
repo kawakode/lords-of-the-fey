@@ -1,9 +1,13 @@
 services:
   mongodb:
-    image: mongo:7.0
+    image: mongo:8.0
     container_name: lotf-mongodb
+    # the database is only ever reached from the app container; publishing it on
+    # 0.0.0.0 exposed an unauthenticated MongoDB to the whole network
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ./init.mongo.js:/docker-entrypoint-initdb.d/init.js:ro
     healthcheck:
@@ -19,6 +23,8 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
     environment:
       NODE_ENV: production
       MONGO_STRING: ${MONGO_STRING:-mongodb://mongodb:27017}
@@ -26,6 +32,8 @@ services:
       LISTENING_IP: 0.0.0.0
       SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET_not_set}
       ORIGIN: ${ORIGIN:-http://localhost:8080}
+      # set to 1 only when a reverse proxy you control sets X-Forwarded-*
+      TRUST_PROXY: ${TRUST_PROXY:-}
     ports:
       - "8180:8080"
     volumes:

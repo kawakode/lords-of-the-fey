@@ -33,12 +33,15 @@
 <h1 class="fey-title">Take a New Name</h1>
 <div class="fey-rule"><span></span></div>
 
+{{#if error}}<div class="fey-error" style="max-width: 430px;">{{error}}</div>{{/if}}
+
 <div class="fey-panel fey-panel-parchment fey-auth">
 <div class="fey-panel-heading">Herald's writ</div>
 <div style="margin-bottom: 14px;">Current name: <strong>{{username}}</strong></div>
 <form action="/changeusername" method="post">
+<input type="hidden" name="_csrf" value="{{csrfToken}}">
 <div class="fey-field">
-  <label for="newname">New username</label><input name="newname" id="newname" autofocus="true">
+  <label for="newname">New username</label><input name="newname" id="newname" autofocus="true" minlength="3" maxlength="24" required>
 </div>
 <div class="fey-form-actions">
   <input type="submit" class="fey-button-primary" value="Change name">

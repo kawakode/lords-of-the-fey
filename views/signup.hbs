@@ -38,11 +38,12 @@
 <div class="fey-panel fey-panel-parchment fey-auth">
 <div class="fey-panel-heading">Oath of enlistment</div>
 <form action="/signup" method="post">
+<input type="hidden" name="_csrf" value="{{csrfToken}}">
 <div class="fey-field">
-  <label for="username">Username</label><input name="username" id="username" autofocus="true" autocomplete="username">
+  <label for="username">Username</label><input name="username" id="username" autofocus="true" autocomplete="username" minlength="3" maxlength="24" required>
 </div>
 <div class="fey-field">
-  <label for="password">Password</label><input type="password" id="password" name="password" autocomplete="new-password">
+  <label for="password">Password</label><input type="password" id="password" name="password" autocomplete="new-password" minlength="12" maxlength="200" required>
 </div>
 <div class="fey-field">
   <label for="passconfirm">Confirm password</label><input type="password" id="passconfirm" name="passconfirm" autocomplete="new-password">

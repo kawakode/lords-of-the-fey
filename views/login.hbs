@@ -39,6 +39,7 @@
 <div class="fey-panel fey-panel-parchment fey-auth">
 <div class="fey-panel-heading">Muster roll</div>
 <form action="/login" method="post">
+<input type="hidden" name="_csrf" value="{{csrfToken}}">
 <div class="fey-field">
   <label for="username">Username</label><input name="username" id="username" autofocus="true" autocomplete="username">
 </div>

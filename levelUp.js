@@ -17,14 +17,24 @@
     along with Lords of the Fey.  If not, see <http://www.gnu.org/licenses/>.
 */
 var socketOwnerCanAct = require("./auth").socketOwnerCanAct;
+var socketPlayer = require("./auth").socketPlayer;
+var security = require("./security");
 var Unit = require("./static/shared/unit.js").Unit;
-var ObjectID = function(input) { if(input.length!=12 && input.length!=24) { return; } return new (require('mongodb').ObjectId)(input); }
+var ObjectID = function(input) { if(!/^[0-9a-fA-F]{24}$/.test(input)) { return; } return new (require('mongodb').ObjectId)(input); }
 
 exports.levelUp = function(collections, data, socket, socketList) {
-    var gameId = ObjectID(data.gameId);
-    var choiceNum = data.choiceNum;
-    var user = socket.request.user;
-        (async function() {
+    data = data || {};
+
+    var gameIdString = security.asObjectIdString(data.gameId);
+    if(!gameIdString) { socket.emit("no game"); return; }
+    var gameId = ObjectID(gameIdString);
+
+    // a non-numeric choice used to survive Math.round as NaN and index the
+    // advancement list with it
+    var choiceNum = security.asInt(data.choiceNum, 0, 63);
+    if(choiceNum == null) { choiceNum = 0; }
+
+        return (async function() {
             var game = await collections.games.findOne({_id:gameId});
             if(!game) { socket.emit("no game"); return; }
 
@@ -33,15 +43,18 @@ exports.levelUp = function(collections, data, socket, socketList) {
                 return;
             }
 
-            var player = game.players.filter(function(p) { return p.username == user.username })[0];
-            if(!player || !player.advancingUnit) { return; }
+            var player = socketPlayer(socket, game);
+            if(!player || typeof player.advancingUnit != "string") { return; }
 
-            var coords = player.advancingUnit.split(",").map(function(i) { return parseInt(i); });
+            var coords = player.advancingUnit.split(",").map(function(i) { return parseInt(i, 10); });
+            if(coords.length != 2 || !Number.isInteger(coords[0]) || !Number.isInteger(coords[1])) { return; }
+
             var unitRecord = await collections.units.findOne({ x:coords[0], y:coords[1], gameId:gameId });
+            if(!unitRecord) { return; }
             var unit = new Unit(unitRecord);
+            if(!unit || !Array.isArray(unit.advancesTo) || !unit.advancesTo.length) { return; }
 
-            choiceNum = Math.round(choiceNum);
-            if(choiceNum >= unit.advancesTo.length || choiceNum < 0) { choiceNum = 0; }
+            if(choiceNum >= unit.advancesTo.length) { choiceNum = 0; }
 
             unit = unit.levelUp(choiceNum);
 
