@@ -5,9 +5,11 @@ Lords of the Fey
 
 A multiplayer turn-based strategy game that you can play in your browser using HTML5 technologies. The game's rules and artwork are taken from [Battle for Wesnoth](http://www.wesnoth.org).
 
+**Note:** This is a maintained fork. I intend to keep this project alive, actively maintain it, and add new features over time.
+
 # Demo
 
-You can play the latest version of the game here : [Lord of the Fey - Bleeding edge server](https://lotf.shinobyte.com/) <sub>hosted on Shinobyte</sub>. Note that some parts of the the code are very experimental, so please feel free to [file a bug report](https://github.com/kawakode/lords-of-the-fey/issues).
+A live demo is available at [lotf.shinobyte.com](https://lotf.shinobyte.com/). For bug reports or feature requests, see [the issue tracker](https://github.com/kawakode/lords-of-the-fey/issues).
 
 # Features
 
@@ -15,64 +17,31 @@ Development is currently focused on implementing Wesnoth-style multiplayer witho
 
 Due to its centralized architecture, Lords of the Fey multiplayer differs from multiplayer in Battle for Wesnoth by having persistent games on the server: players can quit and resume games freely without needing to save the game state and reload. Instead, players have a persistent list of their ongoing games. A player can select any ongoing game to view the game and make moves (on that player's turn), even when other players are offline.
 
-If you're interested in contributing, have a look at the [issue tracker](https://github.com/apsillers/lords-of-the-fey/issues). The game is currently playable, so most development work is directed toward:
+If you're interested in contributing, check out the [issue tracker](https://github.com/kawakode/lords-of-the-fey/issues). Current priorities include:
 
- * implementing new game content (adding more terrain and unit types)
- * adding ability-specific logic (e.g., making the "*drains*" ability actually drain life on attack, etc.)
+ * implementing new game content (terrain and unit types)
+ * adding ability-specific logic (e.g., drains, poisoned, etc.)
  * cosmetic improvements (unit animations and map rendering)
- * adding features outside of actual gameplay (lobby improvements, OAuth-based login, inviting friends to join new games, etc.)
-
-For information about how to get started, check out [the project wiki](https://github.com/apsillers/lords-of-the-fey/wiki).
+ * gameplay features (lobby, OAuth login, game invitations, etc.)
 
 # Running the Code
 
 ## Docker Setup (Recommended)
 
-The easiest way to run Lords of the Fey is with Docker and Docker Compose.
+Requires [Docker](https://www.docker.com/get-started/) and [Docker Compose](https://docs.docker.com/compose/install/).
 
-### Prerequisites
-- [Docker](https://www.docker.com/get-started/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-
-### Quick Start
-
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/apsillers/lords-of-the-fey.git
-    cd lords-of-the-fey
-    ```
-
-2. Create a `.env` file from the example:
-    ```bash
-    cp .env.example .env
-    ```
-
-3. Generate a secure session secret (optional but recommended for production):
-    ```bash
-    # On Linux/Mac
-    openssl rand -base64 32
-    # Then update SESSION_SECRET in .env
-    ```
-
-4. Start the application:
-    ```bash
-    docker-compose up
-    ```
-
-5. Open your browser and navigate to `http://localhost:8080`
-
-6. Log in with credentials:
-   - Username: `hello` or `goodbye`
-   - Password: `world`
-
-To stop the application:
 ```bash
-docker-compose down
+git clone https://github.com/kawakode/lords-of-the-fey.git
+cd lords-of-the-fey
+cp .env.example .env
+docker-compose up
 ```
 
-To view logs:
+Open `http://localhost:8080` and log in with username `hello` or `goodbye`, password `world`.
+
+To stop:
 ```bash
-docker-compose logs -f app
+docker-compose down
 ```
 
 ## Manual Setup
@@ -99,7 +68,6 @@ This will run a local server on port 8080 (or another port, if you have changed 
 
 To run a game, log in, and then click the link to create a new game. To play against an opponent, have the opponent log in as the other player and then visit the URL of the newly-created game. If testing both players on one computer, ensure you use some way to have both sets of credentials simultaneously (different browsers, Chrome incognito, etc.)
 
-To learn more, check out [the project wiki](https://github.com/apsillers/lords-of-the-fey/wiki).
 
 # Importing Wesnoth content
 
